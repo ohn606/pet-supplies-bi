@@ -1,0 +1,39 @@
+# ---- 数据与数仓（大文件；数据集获取方式见 docs/REAL_DATASETS.md）----
+data/
+warehouse/*.db
+warehouse/*.db-shm
+warehouse/*.db-wal
+
+# ---- 看板运行日志 ----
+dashboard/*.log
+
+# ---- 商品图（Amazon 版权内容；本地运行 etl/download_product_images.py 自动生成）----
+dashboard/static/img/*.jpg
+dashboard/static/img/products/
+
+# ---- Python ----
+__pycache__/
+*.pyc
+
+# ---- 工作区内部配置 ----
+.workbuddy/
+
+# ---- 论文与内部文档（本地保留，不入公开仓库）----
+thesis/
+docs/PROJECT_DOC.md
+docs/papers/
+docs/v2.0-差距分析与升级规划.md
+docs/看板用户分层与v1.8.0规划.md
+docs/会话交接-当前进度.md
+docs/参考论文.md
+docs/一、 核心创新亮点提炼（可直接写入论文绪论与总结）.md
+docs/拟解决的关键问题与研究创新点.md
+docs/看板复盘审计报告-2026-10-18.md
+docs/毕业论文进度汇报/
+docs/毕业论文进度汇报/毕业论文进度汇报(1019版).pptx
+docs/毕业论文进度汇报/答辩演示彩排手册.md
+docs/毕业论文进度汇报/推荐评估板块解读与非技术汇报要点.md
+
+# ---- 系统 ----
+Thumbs.db
+.DS_Store

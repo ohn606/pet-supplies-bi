@@ -1,0 +1,23 @@
+[Unit]
+Description=Pet Supplies BI Dashboard (v1.8.1)
+After=network.target
+
+[Service]
+Type=simple
+# 部署根目录按实际路径调整（本 runbook 统一用 /opt/pet-bi）
+WorkingDirectory=/opt/pet-bi
+ExecStart=/usr/bin/python3 /opt/pet-bi/dashboard/server.py
+Environment=DASHBOARD_HOST=0.0.0.0
+Environment=DASHBOARD_PORT=9888
+Restart=always
+RestartSec=3
+# 日志走 journald：journalctl -u bi-dashboard -f
+StandardOutput=journal
+StandardError=journal
+
+# 基础加固
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

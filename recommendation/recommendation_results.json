@@ -1,0 +1,135 @@
+{
+  "evaluation_time": "2026-10-18 15:28:57",
+  "data_stats": {
+    "users": 48473,
+    "products": 20836,
+    "interactions": 147045,
+    "train": 62757,
+    "test": 13146
+  },
+  "results": {
+    "Popularity Baseline": {
+      "precision": 0.001,
+      "recall": 0.01,
+      "f1": 0.0018181818181818184,
+      "hit_rate": 0.01,
+      "coverage": 0.0020157226365652087,
+      "diversity": 0.9999999999999998,
+      "novelty": 0.3742489270386266
+    },
+    "User-Based CF": {
+      "precision": 0.00404040404040404,
+      "recall": 0.03535353535353535,
+      "f1": 0.007252007252007251,
+      "hit_rate": 0.04040404040404041,
+      "coverage": 0.12416851441241686,
+      "diversity": 0.9485358045083664,
+      "novelty": 0.8299394867421709
+    },
+    "Item-Based CF": {
+      "precision": 0.00404040404040404,
+      "recall": 0.030303030303030304,
+      "f1": 0.007130124777183601,
+      "hit_rate": 0.04040404040404041,
+      "coverage": 0.12981253779479943,
+      "diversity": 0.9726001671424142,
+      "novelty": 0.9425424691411277
+    },
+    "SVD Matrix Factorization": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "hit_rate": 0.0,
+      "coverage": 0.02116508768393469,
+      "diversity": 0.7758572544119973,
+      "novelty": 0.9046845493562232
+    },
+    "Content-Based": {
+      "precision": 0.001,
+      "recall": 0.01,
+      "f1": 0.0018181818181818184,
+      "hit_rate": 0.01,
+      "coverage": 0.12114493045756904,
+      "diversity": 0.9321329754162617,
+      "novelty": 0.9828648068669529
+    },
+    "Hybrid Ensemble": {
+      "precision": 0.005,
+      "recall": 0.04,
+      "f1": 0.008888888888888889,
+      "hit_rate": 0.05,
+      "coverage": 0.10844587784720823,
+      "diversity": 0.8934227729369932,
+      "novelty": 0.8890922746781116
+    },
+    "RulesBoost (Temporal)": {
+      "precision": 0.0030000000000000005,
+      "recall": 0.03,
+      "f1": 0.005454545454545455,
+      "hit_rate": 0.03,
+      "coverage": 0.002620439427534771,
+      "diversity": 0.9225497713906672,
+      "novelty": 0.5515751072961375
+    },
+    "Hybrid + RulesBoost": {
+      "precision": 0.004,
+      "recall": 0.035,
+      "f1": 0.007179487179487179,
+      "hit_rate": 0.04,
+      "coverage": 0.09534368070953436,
+      "diversity": 0.8264178531344194,
+      "novelty": 0.8531845493562232
+    },
+    "FM (Full)": {
+      "precision": 0.002,
+      "recall": 0.02,
+      "f1": 0.003636363636363637,
+      "hit_rate": 0.02,
+      "coverage": 0.02338238258415642,
+      "diversity": 0.6967198621646352,
+      "novelty": 0.7406137339055795
+    }
+  },
+  "auc_results": {
+    "Popularity Baseline": {
+      "auc": 0.8413,
+      "logloss": 1.5479,
+      "positives": 13146,
+      "negatives": 83230
+    },
+    "FM (Full)": {
+      "auc": 0.7685,
+      "logloss": 0.9739,
+      "positives": 13146,
+      "negatives": 83230
+    },
+    "FM (w/o Co-Score)": {
+      "auc": 0.7928,
+      "logloss": 0.8235,
+      "positives": 13146,
+      "negatives": 83230
+    },
+    "FM (w/o MF-ID)": {
+      "auc": 0.8662,
+      "logloss": 0.4599,
+      "positives": 13146,
+      "negatives": 83230
+    },
+    "FM (Content-Only)": {
+      "auc": 0.8661,
+      "logloss": 0.4607,
+      "positives": 13146,
+      "negatives": 83230
+    }
+  },
+  "co_score_stats": {
+    "pairs": 62757,
+    "covered": 62739,
+    "coverage": 0.9997
+  },
+  "ablation_summary": {
+    "co_score_gain_auc": -0.0243,
+    "co_score_gain_logloss": -0.1504,
+    "note": "gain = FM(Full) - FM(w/o Co-Score)；LogLoss 越低越好，取 w/o - Full"
+  }
+}

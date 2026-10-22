@@ -1,0 +1,2171 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>宠趣 BI 数据平台</title>
+<script src="/static/js/echarts.min.js"></script>
+<script>if(typeof echarts==='undefined'){document.write('<script src="https://cdn.bootcdn.net/ajax/libs/echarts/5.5.0/echarts.min.js"><\/script>')}</script>
+<style>
+:root{
+  --bg:#faf5ef;--bg-2:#f5ede2;--card:#fffdf9;--card-2:#fdf8f1;
+  --text:#5c3d2e;--text-2:#8a6e5c;--text-3:#b8a395;
+  --border:#ece0d4;--border-light:#f3ebe0;
+  --primary:#d4763a;--primary-light:#e89b5e;--primary-dark:#b5612a;
+  --accent:#c8534e;--green:#7ba05b;--orange:#e8a04a;--red:#c8534e;
+  --teal:#6ba89a;--purple:#a0688a;--gold:#d4a045;--cream:#e8d5b7;
+  --radius:16px;--radius-sm:10px;
+  --shadow:0 2px 8px rgba(92,61,46,.06),0 1px 3px rgba(92,61,46,.04);
+  --shadow-lg:0 6px 24px rgba(92,61,46,.1);
+  --shadow-warm:0 4px 16px rgba(212,118,58,.08);
+}
+
+/* ===== 深色主题 / 大屏演示模式 (v1.4.0) ===== */
+body.theme-dark{
+  --bg:#16130f;--bg-2:#1f1a16;--card:#231e1a;--card-2:#2b251f;
+  --text:#f2e8dd;--text-2:#c9b6a4;--text-3:#8f8073;
+  --border:#3a322c;--border-light:#322b26;
+  --shadow:0 2px 8px rgba(0,0,0,.4),0 1px 3px rgba(0,0,0,.3);
+  --shadow-lg:0 6px 24px rgba(0,0,0,.5);
+  --shadow-warm:0 4px 16px rgba(212,118,58,.22);
+}
+body.theme-dark .sidebar{background:linear-gradient(180deg,#241610 0%,#33200f 40%,#422a15 75%,#52331a 100%)}
+body.theme-dark .kpi-trend.up{background:rgba(200,83,78,.2)}
+body.theme-dark .kpi-trend.down{background:rgba(123,160,91,.2)}
+body.theme-dark .derived-note{background:rgba(212,118,58,.12)}
+body.theme-dark .model-card.best{background:linear-gradient(135deg,rgba(123,160,91,.16) 0%,var(--card) 100%)}
+body.theme-dark .rank-1{background:rgba(212,160,69,.22);color:#e9c98d}
+body.theme-dark .rank-2{background:rgba(180,140,110,.22);color:#d3b298}
+body.theme-dark .rank-3{background:rgba(150,120,100,.2);color:#bfa48c}
+body.theme-dark .tag-purple{background:rgba(160,104,138,.2);color:#c691b0}
+body.theme-dark .tag-pink{background:rgba(200,83,78,.2);color:#e08c87}
+body.theme-dark .tag-green{background:rgba(123,160,91,.2);color:#a3c47c}
+body.theme-dark .tag-orange{background:rgba(212,160,69,.2);color:#e9c98d}
+body.theme-dark .retention-low{color:#8f8073}
+body.theme-dark input,body.theme-dark select,body.theme-dark input[type="date"]{color-scheme:dark}
+
+/* 视图切换工具条 */
+.view-toolbar{position:fixed;top:16px;right:22px;z-index:500;display:flex;gap:8px}
+.vt-btn{padding:8px 15px;border-radius:20px;border:1px solid var(--border);background:var(--card);color:var(--text-2);font-size:12px;font-weight:600;font-family:inherit;cursor:pointer;box-shadow:var(--shadow);transition:all .2s}
+.vt-btn:hover{color:var(--primary);border-color:var(--primary-light);transform:translateY(-1px)}
+.vt-btn.on{color:var(--primary);border-color:var(--primary);background:var(--bg-2)}
+
+/* 大屏演示模式 */
+body.bigscreen{font-size:15px}
+body.bigscreen .sidebar{display:none}
+body.bigscreen .main{margin-left:0;padding:34px 44px 40px}
+body.bigscreen .footer{display:none}
+body.bigscreen .kpi-grid{grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:20px}
+body.bigscreen .kpi-value{font-size:40px}
+body.bigscreen .kpi-label{font-size:15px}
+body.bigscreen .kpi-sub{font-size:13px}
+body.bigscreen .chart{height:470px}
+body.bigscreen .chart-sm{height:370px}
+body.bigscreen .chart-lg{height:560px}
+body.bigscreen .panel-title{font-size:17px}
+body.bigscreen .table-wrap{max-height:760px}
+body.bigscreen table,body.bigscreen .data-table{font-size:15px}
+body.bigscreen .panel{margin-bottom:24px}
+body.bigscreen .row{gap:22px;margin-bottom:22px}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden}
+
+/* Sidebar */
+.sidebar{position:fixed;left:0;top:0;bottom:0;width:250px;background:linear-gradient(180deg,#6b4226 0%,#8b5e3c 40%,#a0683c 75%,#b8784a 100%);z-index:100;display:flex;flex-direction:column;box-shadow:3px 0 16px rgba(92,61,46,.15)}
+.sidebar-logo{padding:28px 20px 20px;text-align:center;border-bottom:1px solid rgba(255,255,255,.12)}
+.sidebar-logo .icon{font-size:36px;display:block;margin-bottom:6px;filter:drop-shadow(0 2px 4px rgba(0,0,0,.15))}
+.sidebar-logo .title{color:#fff8f0;font-size:17px;font-weight:700;letter-spacing:0.5px;text-shadow:0 1px 3px rgba(0,0,0,.15)}
+.sidebar-logo .sub{color:rgba(255,248,240,.55);font-size:11px;margin-top:3px;letter-spacing:0.5px}
+.sidebar-nav{flex:1;padding:16px 0;overflow-y:auto}
+.sidebar-nav .nav-item{display:flex;align-items:center;gap:12px;padding:13px 24px;color:rgba(255,248,240,.65);cursor:pointer;font-size:14px;transition:all .25s;border-left:4px solid transparent}
+.sidebar-nav .nav-item:hover{color:#fff;background:rgba(255,255,255,.06)}
+.sidebar-nav .nav-item.active{color:#fff;background:rgba(255,255,255,.1);border-left-color:#e8a04a;font-weight:600}
+.sidebar-nav .nav-item .nav-icon{font-size:20px;width:26px;text-align:center}
+.sidebar-nav .nav-section{padding:18px 24px 6px;font-size:11px;color:rgba(255,248,240,.35);text-transform:uppercase;letter-spacing:1.5px;font-weight:600}
+
+/* ===== v1.8.0 双角色分层（业务视角 / 技术视角） ===== */
+.role-switch{display:flex;gap:6px;padding:12px 16px;border-bottom:1px solid rgba(255,255,255,.12)}
+.role-btn{flex:1;padding:7px 4px;border:none;border-radius:8px;background:rgba(255,255,255,.14);color:rgba(255,248,240,.85);font-size:12px;cursor:pointer;transition:all .2s;white-space:nowrap}
+.role-btn:hover{background:rgba(255,255,255,.26);color:#fff}
+.role-btn.active{background:#e8a04a;color:#3d2410;font-weight:700;box-shadow:0 2px 6px rgba(0,0,0,.22)}
+body.theme-dark .role-btn{background:rgba(255,255,255,.08)}
+/* 业务视角：隐藏技术专属模块（推荐监控 / A/B 模拟 / 桑基 / 热力图） */
+body.role-business [data-audience="tech"]{display:none !important}
+/* 业务视角：隐藏技术性 fine-print（panel-hint），口径卡折叠为 ⓘ 按钮 */
+body.role-business .panel-hint{display:none}
+.cal-toggle{display:none;margin:10px 0 0;padding:4px 12px;border:1px solid var(--border,#e8d5b7);border-radius:12px;background:transparent;color:var(--text-3);font-size:11px;cursor:pointer}
+.cal-toggle.open{background:var(--bg-2,#faf6f2);font-weight:600}
+body.role-business .cal-toggle{display:inline-block}
+body.role-business .cal-tech{display:none}
+body.role-business .cal-tech.open{display:block}
+/* 技术视角：ⓘ 按钮不可见（口径卡默认全量展开） */
+body.role-tech .cal-toggle{display:none}
+.sidebar-footer{padding:16px 20px;border-top:1px solid rgba(255,255,255,.1);font-size:11px;color:rgba(255,248,240,.35);text-align:center;line-height:1.6}
+
+/* Main */
+.main{margin-left:250px;min-height:100vh;padding:24px 28px 60px}
+.page{display:none}
+.page.active{display:block;animation:fadeIn .4s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* Page header */
+.page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px}
+.page-title{font-size:24px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px}
+.page-desc{font-size:13px;color:var(--text-2);margin-top:4px}
+.page-badge{background:linear-gradient(135deg,var(--primary-light),var(--orange));color:#fff;padding:7px 18px;border-radius:20px;font-size:12px;font-weight:600;box-shadow:var(--shadow-warm);white-space:nowrap}
+
+/* ===== Time Range Filter Bar ===== */
+.filter-bar{display:flex;align-items:center;gap:12px;padding:14px 20px;background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:20px;border:1px solid var(--border-light);flex-wrap:wrap}
+.filter-bar .filter-label{font-size:13px;font-weight:600;color:var(--text-2);display:flex;align-items:center;gap:6px;white-space:nowrap}
+.filter-bar input[type="date"]{padding:8px 14px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:13px;color:var(--text);background:var(--bg);outline:none;transition:border .2s;font-family:inherit}
+.filter-bar input[type="date"]:focus{border-color:var(--primary)}
+.filter-bar select{padding:8px 14px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:13px;color:var(--text);background:var(--bg);outline:none;cursor:pointer;font-family:inherit}
+.filter-bar select:focus{border-color:var(--primary)}
+.filter-bar .btn{padding:8px 18px;border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:6px;font-family:inherit}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-primary:hover{background:var(--primary-dark);box-shadow:var(--shadow-warm)}
+.btn-outline{background:transparent;color:var(--primary);border:1.5px solid var(--primary)}
+.btn-outline:hover{background:rgba(212,118,58,.08)}
+.btn-export{background:var(--green);color:#fff}
+.btn-export:hover{background:#6b8f4c;box-shadow:0 2px 8px rgba(123,160,91,.3)}
+.filter-spacer{flex:1}
+.filter-hint{font-size:11px;color:var(--text-3)}
+
+/* KPI cards */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:14px;margin-bottom:20px}
+.kpi-card{background:var(--card);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);position:relative;overflow:hidden;transition:transform .25s,box-shadow .25s;border:1px solid var(--border-light)}
+.kpi-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg);background:var(--card-2)}
+.kpi-card::before{content:'';position:absolute;top:0;left:0;width:5px;height:100%;border-radius:5px 0 0 5px}
+.kpi-card.c1::before{background:var(--primary)}.kpi-card.c2::before{background:var(--accent)}
+.kpi-card.c3::before{background:var(--green)}.kpi-card.c4::before{background:var(--orange)}
+.kpi-card.c5::before{background:var(--teal)}.kpi-card.c6::before{background:var(--purple)}
+.kpi-label{font-size:12px;color:var(--text-2);margin-bottom:8px;display:flex;align-items:center;gap:6px;font-weight:500}
+.kpi-value{font-size:26px;font-weight:800;color:var(--text);line-height:1.2}
+.kpi-sub{font-size:11px;color:var(--text-3);margin-top:4px}
+.kpi-trend{display:inline-flex;align-items:center;gap:2px;font-size:11px;font-weight:600;padding:2px 8px;border-radius:6px;margin-top:6px}
+.kpi-trend.up{color:var(--red);background:#fdf0ef}
+.kpi-trend.down{color:var(--green);background:#f0f5ec}
+
+/* Panels */
+.panel{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;border:1px solid var(--border-light);transition:box-shadow .25s;margin-bottom:16px}
+.panel:hover{box-shadow:var(--shadow-lg)}
+.panel-header{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--border-light)}
+.panel-title{font-size:14px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:8px}
+.panel-body{padding:16px 20px}
+.chart{width:100%;height:350px}
+.chart-sm{width:100%;height:280px}
+.chart-lg{width:100%;height:420px}
+.chart-xl{width:100%;height:500px}
+
+/* Grid */
+.row{display:grid;gap:16px;margin-bottom:16px}
+.row-2{grid-template-columns:1fr 1fr}
+.row-3{grid-template-columns:1fr 1fr 1fr}
+.row-2-1{grid-template-columns:2fr 1fr}
+.row-1-2{grid-template-columns:1fr 2fr}
+
+/* Table */
+.table-wrap{overflow-x:auto;border-radius:10px;max-height:520px;overflow-y:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead th{background:var(--bg-2);padding:11px 14px;text-align:left;font-weight:600;color:var(--text-2);border-bottom:2px solid var(--border);white-space:nowrap;position:sticky;top:0;z-index:1}
+tbody td{padding:9px 14px;border-bottom:1px solid var(--border-light);color:var(--text)}
+tbody tr:hover{background:var(--bg-2)}
+.rank-badge{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;font-size:12px;font-weight:700}
+.rank-1{background:#fbe9c7;color:#a0683c}.rank-2{background:#f5e0d0;color:#8b5e3c}.rank-3{background:#f0dcc8;color:#a0785c}
+.rating-stars{color:var(--gold);letter-spacing:1px}
+.tag{display:inline-block;padding:3px 10px;border-radius:6px;font-size:11px;font-weight:600}
+.tag-purple{background:#f0e0ec;color:#a0688a}.tag-pink{background:#f5ddd9;color:#c8534e}
+.tag-green{background:#e0ecd5;color:#5e7d3e}.tag-orange{background:#fbe9c7;color:#a0683c}
+.stat-pill{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:20px;background:var(--bg-2);font-size:13px;color:var(--text)}
+
+/* 派生数据标注（铁律：推断字段必须显式声明来源与边界） */
+.panel-hint{margin-left:auto;font-size:11px;color:var(--text-3);font-weight:500}
+.data-table{width:100%;border-collapse:collapse;font-size:12px}
+.data-table thead th{background:var(--bg-2);padding:8px 10px;color:var(--text-2);border-bottom:2px solid var(--border)}
+.data-table tbody td{padding:7px 10px;border-bottom:1px solid var(--border-light)}
+.lc-chip{flex:1;min-width:120px;padding:8px 12px;border-radius:10px;background:var(--bg-2);border:1px solid var(--border-light)}
+.lc-chip .k{font-size:11px;color:var(--text-3)}
+.lc-chip .v{font-size:15px;font-weight:700;color:var(--text);margin-top:2px}
+.derived-note{margin-top:10px;padding:10px 12px;border-radius:10px;background:#fff8ec;border-left:3px solid var(--primary);font-size:11px;color:var(--text-2);line-height:1.7}
+
+/* Loading */
+.loading-wrap{display:flex;align-items:center;justify-content:center;padding:60px;color:var(--text-3);flex-direction:column;gap:12px}
+.spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Model cards */
+.model-card{background:var(--card);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);border:2px solid transparent;transition:all .25s}
+.model-card:hover{border-color:var(--primary-light);box-shadow:var(--shadow-lg);transform:translateY(-2px)}
+.model-card.best{border-color:var(--green);background:linear-gradient(135deg,#f0f5ec 0%,var(--card) 100%)}
+.model-name{font-size:14px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:8px;color:var(--text)}
+.model-metrics{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.metric-item{display:flex;flex-direction:column;align-items:center;padding:7px;background:var(--bg-2);border-radius:8px}
+.metric-label{font-size:10px;color:var(--text-3);margin-bottom:2px}
+.metric-value{font-size:15px;font-weight:700;color:var(--primary)}
+.metric-value.high{color:var(--green)}
+.badge-best{background:var(--green);color:#fff;font-size:10px;padding:2px 8px;border-radius:6px;font-weight:600}
+
+/* Retention table */
+.retention-cell{text-align:center;font-size:11px;font-weight:600;padding:2px 0}
+.retention-high{color:#7ba05b}.retention-mid{color:#e8a04a}.retention-low{color:#b8a395}
+
+/* Toast */
+.toast{position:fixed;top:20px;right:20px;z-index:9999;padding:12px 24px;border-radius:var(--radius-sm);font-size:13px;font-weight:600;color:#fff;box-shadow:var(--shadow-lg);animation:toastIn .3s ease;display:none}
+.toast.success{background:var(--green)}.toast.error{background:var(--red)}
+@keyframes toastIn{from{opacity:0;transform:translateX(50px)}to{opacity:1;transform:translateX(0)}}
+
+/* Footer */
+.footer{text-align:center;padding:20px;color:var(--text-3);font-size:12px;border-top:1px solid var(--border);margin-top:20px}
+
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--cream);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--orange)}
+
+@media(max-width:1200px){.row-2,.row-3,.row-2-1,.row-1-2{grid-template-columns:1fr}}
+@media(max-width:768px){.sidebar{width:60px}.sidebar-logo .title,.sidebar-logo .sub,.sidebar-nav .nav-item span:last-child,.sidebar-nav .nav-section,.sidebar-footer{display:none}.main{margin-left:60px;padding:16px}.kpi-grid{grid-template-columns:1fr 1fr}.filter-bar{flex-direction:column;align-items:flex-start}}
+
+/* ================= 宠物热销榜 · 黏土风（scoped to #page-pets） ================= */
+#page-pets .pets-wrap{position:relative;background:linear-gradient(160deg,#FAEBD9 0%,#F6E2C9 55%,#F3D9BE 100%);border-radius:34px;padding:26px 30px 24px;overflow:hidden;box-shadow:inset 0 2px 6px rgba(255,255,255,.7),0 18px 44px rgba(160,110,60,.14)}
+#page-pets .pets-deco{position:absolute;pointer-events:none;opacity:.55;filter:drop-shadow(0 10px 14px rgba(160,110,60,.25));animation:petsFloat 7s ease-in-out infinite}
+#page-pets .deco-bone{font-size:52px;top:14px;right:38%;animation-delay:0s}
+#page-pets .deco-yarn{font-size:44px;top:120px;right:2.5%;animation-delay:1.2s}
+#page-pets .deco-bowl{font-size:40px;bottom:88px;left:1.5%;animation-delay:2.1s}
+#page-pets .deco-paw{font-size:36px;bottom:20px;right:36%;animation-delay:3s;opacity:.35}
+@keyframes petsFloat{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-14px) rotate(6deg)}}
+#page-pets .pets-head{display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap;margin-bottom:16px;position:relative;z-index:2}
+#page-pets .pets-title{font-size:27px;font-weight:800;color:#6B4A2F;letter-spacing:.5px}
+#page-pets .pets-subtitle{font-size:13px;color:#A08570;margin-top:4px}
+#page-pets .pets-search{display:flex;align-items:center;gap:8px;background:#FFF3E4;border-radius:999px;padding:11px 20px;width:320px;box-shadow:inset 3px 3px 7px rgba(190,130,80,.20),inset -3px -3px 7px rgba(255,255,255,.95)}
+#page-pets .pets-search input{border:none;background:transparent;outline:none;color:#6B4A2F;font-size:13.5px;width:100%}
+#page-pets .pets-search input::placeholder{color:#C4AE97}
+#page-pets .pets-filterbar{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;background:#FFF6EC;border-radius:26px;padding:13px 18px;margin-bottom:16px;box-shadow:10px 10px 24px rgba(190,130,80,.16),-8px -8px 18px rgba(255,255,255,.9),inset 1px 1px 3px rgba(255,255,255,.7);position:relative;z-index:2}
+#page-pets .pets-chips{display:flex;gap:8px;flex-wrap:wrap}
+#page-pets .pets-chip{border:none;cursor:pointer;padding:8px 16px;border-radius:999px;font-size:13px;background:#FFEEDC;color:#8A6A50;box-shadow:4px 4px 10px rgba(190,130,80,.16),-4px -4px 8px rgba(255,255,255,.85);transition:all .2s}
+#page-pets .pets-chip:hover{transform:translateY(-1px)}
+#page-pets .pets-chip.active{background:linear-gradient(135deg,#F5A65B,#E8894A);color:#fff;font-weight:700;box-shadow:4px 4px 12px rgba(232,137,74,.4),inset 1px 1px 3px rgba(255,255,255,.4)}
+#page-pets .pets-filter-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+#page-pets .pets-flabel{font-size:12px;color:#A08570}
+#page-pets .pets-select{border:none;outline:none;cursor:pointer;background:#FFF3E4;color:#6B4A2F;font-size:13px;border-radius:999px;padding:9px 14px;box-shadow:inset 2px 2px 6px rgba(190,130,80,.18),inset -2px -2px 6px rgba(255,255,255,.9)}
+#page-pets .pets-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:16px;position:relative;z-index:2}
+#page-pets .pets-kpi{background:#FFF9F2;border-radius:26px;padding:17px 20px;box-shadow:12px 12px 26px rgba(190,130,80,.16),-9px -9px 20px rgba(255,255,255,.92),inset 2px 2px 5px rgba(255,255,255,.75)}
+#page-pets .pets-kpi-label{font-size:13px;color:#A08570}
+#page-pets .pets-kpi-value{font-size:29px;font-weight:800;color:#E8894A;margin-top:5px;line-height:1.1}
+#page-pets .pets-kpi-sub{font-size:11.5px;color:#B8A395;margin-top:4px}
+#page-pets .pets-main{display:grid;grid-template-columns:1fr 372px;gap:16px;align-items:start;position:relative;z-index:2}
+#page-pets .pets-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(228px,1fr));gap:15px}
+#page-pets .pets-card{background:#FFF9F2;border-radius:26px;overflow:hidden;display:flex;flex-direction:column;box-shadow:11px 11px 24px rgba(190,130,80,.15),-8px -8px 18px rgba(255,255,255,.9),inset 1px 1px 4px rgba(255,255,255,.7);transition:transform .25s ease}
+#page-pets .pets-card:hover{transform:translateY(-5px)}
+#page-pets .pets-card-img{position:relative;height:138px;background:#FFEEDC;overflow:hidden}
+#page-pets .pets-card-img img{width:100%;height:100%;object-fit:cover;display:block}
+#page-pets .pets-badge-best{position:absolute;top:11px;left:11px;background:linear-gradient(135deg,#F7C948,#F2A93B);color:#fff;font-size:11px;font-weight:800;padding:5px 13px;border-radius:999px;box-shadow:0 6px 14px rgba(242,169,59,.45);letter-spacing:.5px}
+#page-pets .pets-rank{position:absolute;top:11px;right:11px;background:rgba(255,249,242,.92);color:#B5612A;font-size:11px;font-weight:800;padding:4px 11px;border-radius:999px;box-shadow:0 4px 10px rgba(160,110,60,.2)}
+#page-pets .pets-card-body{padding:13px 15px 14px;display:flex;flex-direction:column;gap:6px;flex:1}
+#page-pets .pets-card-name{font-size:13.5px;font-weight:700;color:#5C3D2E;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:38px}
+#page-pets .pets-card-tags{display:flex;gap:6px;flex-wrap:wrap}
+#page-pets .pets-tag{font-size:10.5px;padding:3px 9px;border-radius:999px;background:#F5E6D3;color:#8A6A50}
+#page-pets .pets-tag.pet{color:#fff;font-weight:600}
+#page-pets .pets-card-rating{font-size:11.5px;color:#B8A395}
+#page-pets .pets-card-rating .stars{color:#F2B84B;letter-spacing:1px;font-size:12.5px}
+#page-pets .pets-card-row{display:flex;align-items:baseline;justify-content:space-between;margin-top:auto}
+#page-pets .pets-price{font-size:18px;font-weight:800;color:#E8894A}
+#page-pets .pets-sales{font-size:11.5px;color:#A08570}
+#page-pets .pets-card-actions{display:flex;gap:8px;margin-top:9px}
+#page-pets .pets-btn{flex:1;border:none;cursor:pointer;padding:8px 0;border-radius:999px;font-size:12px;transition:all .2s}
+#page-pets .pets-btn-detail{background:#FFEEDC;color:#B5612A;font-weight:600}
+#page-pets .pets-btn-detail:hover{background:#FFE2C2}
+#page-pets .pets-btn-compare{background:linear-gradient(135deg,#7FB069,#6FA055);color:#fff;font-weight:700}
+#page-pets .pets-btn-compare:hover{filter:brightness(1.06)}
+#page-pets .pets-btn-compare.in{background:#FFEEDC;color:#8A6A50}
+#page-pets .pets-side{display:flex;flex-direction:column;gap:16px}
+#page-pets .pets-panel{background:#FFF9F2;border-radius:26px;padding:16px 18px;box-shadow:11px 11px 24px rgba(190,130,80,.15),-8px -8px 18px rgba(255,255,255,.9),inset 1px 1px 4px rgba(255,255,255,.7)}
+#page-pets .pets-panel-title{font-size:15px;font-weight:800;color:#6B4A2F;margin-bottom:8px}
+#page-pets .pets-chart{width:100%;height:236px}
+#page-pets .pets-share-legend{display:flex;flex-wrap:wrap;gap:7px 12px;margin-top:6px}
+#page-pets .pets-lg-item{display:flex;align-items:center;gap:6px;font-size:11.5px;color:#8A6A50}
+#page-pets .pets-lg-dot{width:9px;height:9px;border-radius:50%}
+#page-pets .pets-compare-body{max-height:264px;overflow-y:auto;padding-right:4px}
+#page-pets .pets-compare-empty{font-size:12px;color:#B8A395;text-align:center;padding:26px 8px;line-height:1.7}
+#page-pets .pets-cmp-item{display:flex;align-items:center;gap:10px;background:#FFF3E4;border-radius:18px;padding:8px 10px;margin-bottom:8px;box-shadow:inset 2px 2px 5px rgba(255,255,255,.8),3px 3px 8px rgba(190,130,80,.1)}
+#page-pets .pets-cmp-item img{width:42px;height:42px;border-radius:13px;object-fit:cover;background:#FFEEDC}
+#page-pets .pets-cmp-name{flex:1;font-size:11.5px;color:#5C3D2E;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#page-pets .pets-cmp-sales{font-size:10.5px;color:#A08570}
+#page-pets .pets-cmp-remove{border:none;cursor:pointer;background:#FFE2C2;color:#B5612A;width:22px;height:22px;border-radius:50%;font-size:11px;line-height:1;flex:none}
+#page-pets .pets-compare-foot{border-top:1px dashed #E8D5B7;margin-top:8px;padding-top:10px}
+#page-pets .pets-cmp-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+#page-pets .pets-cmp-stat{background:#FFF3E4;border-radius:14px;padding:8px 11px}
+#page-pets .pets-cmp-stat .k{font-size:10.5px;color:#A08570}
+#page-pets .pets-cmp-stat .v{font-size:15px;font-weight:800;color:#6B4A2F}
+#page-pets .pets-cmp-btns{display:flex;gap:8px}
+#page-pets .pets-cmp-btn{flex:1;border:none;cursor:pointer;padding:8px 0;border-radius:999px;font-size:12px;font-weight:700}
+#page-pets .pets-cmp-clear{background:#FFEEDC;color:#B5612A}
+#page-pets .pets-cmp-export{background:linear-gradient(135deg,#7FB069,#6FA055);color:#fff}
+#page-pets .pets-banner{margin-top:16px;background:linear-gradient(135deg,#7FB069,#5F9050);color:#fff;font-size:15px;font-weight:800;text-align:center;padding:16px 20px;border-radius:22px;letter-spacing:.6px;box-shadow:0 14px 30px rgba(95,144,80,.35),inset 0 2px 4px rgba(255,255,255,.35);position:relative;z-index:2}
+#page-pets .pets-modal-mask{position:fixed;inset:0;background:rgba(92,61,46,.5);display:none;align-items:center;justify-content:center;z-index:2000;padding:20px}
+#page-pets .pets-modal-mask.show{display:flex}
+#page-pets .pets-modal{position:relative;background:#FFF9F2;border-radius:30px;width:780px;max-width:94vw;max-height:90vh;overflow-y:auto;padding:26px 28px;box-shadow:0 30px 70px rgba(92,61,46,.35)}
+#page-pets .pets-modal-close{position:absolute;top:16px;right:16px;border:none;cursor:pointer;width:34px;height:34px;border-radius:50%;background:#FFEEDC;color:#B5612A;font-size:14px;box-shadow:3px 3px 8px rgba(190,130,80,.25)}
+#page-pets .pets-modal-grid{display:grid;grid-template-columns:230px 1fr;gap:22px}
+#page-pets .pets-modal-imgbox img{width:100%;border-radius:22px;background:#FFEEDC;box-shadow:8px 8px 20px rgba(190,130,80,.2)}
+#page-pets .pets-modal-cat{display:inline-block;font-size:11.5px;font-weight:700;color:#fff;padding:4px 12px;border-radius:999px;margin-bottom:8px}
+#page-pets .pets-modal-name{font-size:19px;font-weight:800;color:#5C3D2E;line-height:1.4}
+#page-pets .pets-modal-meta{font-size:12.5px;color:#8A6A50;margin-top:6px;line-height:1.7}
+#page-pets .pets-modal-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
+#page-pets .pm-stat{background:#FFF3E4;border-radius:16px;padding:10px 12px;box-shadow:inset 2px 2px 5px rgba(255,255,255,.85)}
+#page-pets .pm-stat .k{font-size:10.5px;color:#A08570}
+#page-pets .pm-stat .v{font-size:16px;font-weight:800;color:#E8894A;margin-top:2px}
+#page-pets .pets-modal-trend{margin-top:18px}
+@media(max-width:1100px){#page-pets .pets-main{grid-template-columns:1fr}#page-pets .pets-kpis{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+
+<!-- 视图模式工具条：深色主题 / 大屏演示（v1.4.0） -->
+<div class="view-toolbar">
+  <button class="vt-btn" id="btn-theme" onclick="toggleTheme()" title="切换深色/浅色主题（快捷键 D）">🌙 深色</button>
+  <button class="vt-btn" id="btn-bigscreen" onclick="toggleBigScreen()" title="大屏演示模式（快捷键 B）">⛶ 大屏</button>
+</div>
+
+<!-- Sidebar -->
+<div class="sidebar">
+  <div class="sidebar-logo">
+    <span class="icon">🐾</span><span class="title">宠趣 BI 平台</span>
+    <span class="sub">Pet Supplies Analytics</span>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="role-switch" id="role-switch">
+      <button class="role-btn active" id="role-btn-biz" onclick="setRole('business')" title="面向商家/运营：只看经营结果与动作建议">🏪 业务视角</button>
+      <button class="role-btn" id="role-btn-tech" onclick="setRole('tech')" title="面向算法/评审：全量方法与口径">🔬 技术视角</button>
+    </div>
+    <div class="nav-section">数据看板</div>
+    <div class="nav-item active" onclick="switchPage('dashboard',this)"><span class="nav-icon">📊</span><span>看板总览</span></div>
+    <div class="nav-item" onclick="switchPage('products',this)"><span class="nav-icon">📦</span><span>商品分析</span></div>
+    <div class="nav-item" onclick="switchPage('pets',this)"><span class="nav-icon">🏆</span><span>热销榜</span></div>
+    <div class="nav-item" data-audience="tech" onclick="switchPage('recommendation',this)"><span class="nav-icon">🎯</span><span>推荐监控</span></div>
+    <div class="nav-section">用户洞察</div>
+    <div class="nav-item" onclick="switchPage('users',this)"><span class="nav-icon">👥</span><span>用户分析</span></div>
+    <div class="nav-item" onclick="switchPage('basket',this)"><span class="nav-icon">🧺</span><span>购物篮洞察</span></div>
+    <div class="nav-item" data-audience="tech" onclick="switchPage('ab',this)"><span class="nav-icon">🧪</span><span>A/B 模拟实验</span></div>
+  </nav>
+  <div class="sidebar-footer">🐱🐶🐹 宠趣数据<br>v2.0 © 2026
+    <div id="src-tag" style="display:none;margin-top:8px;font-size:11px;line-height:1.5;background:rgba(255,255,255,.18);border-radius:8px;padding:6px 8px">数据源：公开真实数据集（多源融合）</div>
+  </div>
+</div>
+
+<!-- Main -->
+<div class="main">
+
+<!-- ====== Page 1: Dashboard Overview ====== -->
+<div class="page active" id="page-dashboard">
+  <div class="page-header">
+    <div><div class="page-title">📊 看板总览</div><div class="page-desc">宠物用品电商平台核心运营指标实时监控</div></div>
+    <span class="page-badge" id="ov-period-badge">📅 数据周期加载中…</span>
+  </div>
+  <div class="kpi-grid">
+    <div class="kpi-card c1"><div class="kpi-label">👥 累计用户</div><div class="kpi-value" id="kpi-users">--</div><div class="kpi-sub" id="kpi-users-sub"></div></div>
+    <div class="kpi-card c2"><div class="kpi-label">🛒 已完成订单</div><div class="kpi-value" id="kpi-orders">--</div><div class="kpi-sub" id="kpi-orders-sub"></div></div>
+    <div class="kpi-card c3"><div class="kpi-label">💰 累计销售额</div><div class="kpi-value" id="kpi-revenue">--</div><div class="kpi-sub" id="kpi-revenue-sub"></div></div>
+    <div class="kpi-card c4"><div class="kpi-label">📦 在售商品</div><div class="kpi-value" id="kpi-products">--</div><div class="kpi-sub" id="kpi-products-sub"></div></div>
+    <div class="kpi-card c5"><div class="kpi-label">🔄 复购率</div><div class="kpi-value" id="kpi-repurchase">--</div><div class="kpi-sub" id="kpi-repurchase-sub"></div></div>
+    <div class="kpi-card c6"><div class="kpi-label">⭐ 评价总数</div><div class="kpi-value" id="kpi-reviews">--</div><div class="kpi-sub" id="kpi-reviews-sub"></div></div>
+  </div>
+  <div class="row row-2">
+    <div class="panel"><div class="panel-header"><span class="panel-title">📈 销售额与订单趋势</span></div><div class="panel-body"><div class="chart" id="chart-sales"></div></div></div>
+    <div class="panel"><div class="panel-header"><span class="panel-title">👆 用户行为趋势 (PV/UV)</span><span class="panel-hint" style="font-size:11px;color:var(--text-3)">行为域子采样，非全量日志</span></div><div class="panel-body"><div class="chart" id="chart-behavior"></div></div></div>
+  </div>
+  <div class="row row-3">
+    <div class="panel"><div class="panel-header"><span class="panel-title">🐱 宠物类型分布</span></div><div class="panel-body"><div class="chart-sm" id="chart-pet"></div></div></div>
+    <div class="panel"><div class="panel-header"><span class="panel-title">🏆 RFM 用户价值分层</span></div><div class="panel-body"><div class="chart-sm" id="chart-rfm"></div></div></div>
+    <div class="panel"><div class="panel-header"><span class="panel-title">💳 消费层级分布</span><span class="panel-hint" style="font-size:11px;color:var(--text-3)">原"城市等级"在真实数据源中为常量，已替换</span></div><div class="panel-body"><div class="chart-sm" id="chart-city"></div></div></div>
+  </div>
+  <div class="row row-2">
+    <div class="panel"><div class="panel-header"><span class="panel-title">🕐 24小时活跃度分布</span><span class="panel-hint" style="font-size:11px;color:var(--text-3)">行为口径（真实订单无小时粒度）</span></div><div class="panel-body"><div class="chart" id="chart-hour"></div></div></div>
+    <div class="panel"><div class="panel-header"><span class="panel-title">🛍️ 一级类目销售额排行</span></div><div class="panel-body"><div class="chart" id="chart-cat"></div></div></div>
+  </div>
+</div>
+
+<!-- ====== Page 2: Product Analysis ====== -->
+<div class="page" id="page-products">
+  <div class="page-header">
+    <div><div class="page-title">📦 商品分析报表</div><div class="page-desc">商品销售绩效、品牌竞争、价格与评分分布全景分析</div></div>
+    <span class="page-badge" id="prod-badge">📦 商品加载中…</span>
+  </div>
+
+  <!-- Time Filter -->
+  <div class="filter-bar">
+    <span class="filter-label">📅 时间范围:</span>
+    <input type="date" id="p-start" value="2025-10-01" onchange="loadProducts()">
+    <span style="color:var(--text-3)">至</span>
+    <input type="date" id="p-end" value="2026-06-30" onchange="loadProducts()">
+    <select id="p-category" onchange="loadProducts()"><option value="">全部类目</option><option value="猫用品">🐱 猫用品</option><option value="狗用品">🐶 狗用品</option><option value="小宠用品">🐹 小宠用品</option><option value="水族用品">🐟 水族用品</option><option value="鸟类用品">🐦 鸟类用品</option><option value="通用用品">🛒 通用用品</option></select>
+    <div class="filter-spacer"></div>
+    <button class="btn btn-export" onclick="exportData('product_sales_detail', {start: getVal('p-start'), end: getVal('p-end'), category: getVal('p-category'), limit: 100}, '商品销售明细')">📥 导出数据</button>
+    <span class="filter-hint">筛选时段内数据自动刷新</span>
+  </div>
+
+  <div class="kpi-grid" id="p-kpi-grid">
+    <div class="kpi-card c1"><div class="kpi-label">📦 动销商品数</div><div class="kpi-value" id="p-val1">--</div></div>
+    <div class="kpi-card c2"><div class="kpi-label">🛒 总订单量</div><div class="kpi-value" id="p-val2">--</div></div>
+    <div class="kpi-card c3"><div class="kpi-label">💰 总销售额</div><div class="kpi-value" id="p-val3">--</div></div>
+    <div class="kpi-card c4"><div class="kpi-label">🏷️ 品牌数量</div><div class="kpi-value" id="p-val4">--</div></div>
+    <div class="kpi-card c5"><div class="kpi-label">⭐ 平均评分</div><div class="kpi-value" id="p-val5">--</div></div>
+    <div class="kpi-card c6"><div class="kpi-label">📈 平均客单价</div><div class="kpi-value" id="p-val6">--</div></div>
+  </div>
+
+  <!-- Product sales trend (time-filterable) -->
+  <div class="row row-2">
+    <div class="panel"><div class="panel-header"><span class="panel-title">📈 商品销售额趋势（按时段筛选）</span></div><div class="panel-body"><div class="chart" id="p-chart-trend"></div></div></div>
+    <div class="panel"><div class="panel-header"><span class="panel-title">📊 类目销售占比树图</span></div><div class="panel-body"><div class="chart" id="p-chart-treemap"></div></div></div>
+  </div>
+
+  <!-- Top products table (filterable) -->
+  <div class="panel">
+    <div class="panel-header"><span class="panel-title">🏆 热销商品排行</span><span style="font-size:11px;color:var(--text-3)">按筛选时段销售排名</span></div>
+    <div class="panel-body"><div class="table-wrap"><table id="tbl-products"><thead><tr><th style="width:50px">排名</th><th>商品名称</th><th>类目</th><th style="text-align:right">均价</th><th style="text-align:right">销量</th><th style="text-align:right">收入(¥)</th><th style="text-align:center">评分</th><th style="text-align:right">购买用户</th></tr></thead><tbody></tbody></table></div></div>
+  </div>
+
+  <!-- Brand + Price -->
+  <div class="row row-2">
+    <div class="panel"><div class="panel-header"><span class="panel-title">🏷️ 品牌销售额 TOP15</span></div><div class="panel-body"><div class="chart" id="p-chart-brand"></div></div></div>
+    <div class="panel"><div class="panel-header"><span class="panel-title">💲 价格区间 × 销量分布</span><span class="panel-hint" style="font-size:11px;color:var(--text-3)">含 2.5% 外币折算商品（Amazon INR / Chewy USD 源）</span></div><div class="panel-body"><div class="chart" id="p-chart-price"></div></div></div>
+  </div>
+
+  <!-- Category detail + Rating -->
+  <div class="row row-2">
+    <div class="panel"><div class="panel-header"><span class="panel-title">📊 类目销售明细对比</span></div><div class="panel-body"><div class="chart" id="p-chart-cat"></div></div></div>
+    <div class="panel"><div class="panel-header"><span class="panel-title">⭐ 商品评分分布</span><span class="panel-hint" style="font-size:11px;color:var(--text-3)">全周期商品属性口径（评分为累计均分，不随时间筛选变化）</span></div><div class="panel-body"><div class="chart" id="p-chart-rating"></div></div></div>
+  </div>
+</div>
+
+<!-- ====== Page 3: Recommendation Monitoring ====== -->
+<div class="page" id="page-pets">
+  <!-- ============ 宠物热销榜 · 黏土风（claymorphism）============ -->
+  <div class="pets-wrap">
+    <!-- 浮动装饰 -->
+    <div class="pets-deco deco-bone">🦴</div>
+    <div class="pets-deco deco-yarn">🧶</div>
+    <div class="pets-deco deco-bowl">🥣</div>
+    <div class="pets-deco deco-paw">🐾</div>
+
+    <!-- 标题 + 搜索 -->
+    <div class="pets-head">
+      <div>
+        <div class="pets-title">🏆 宠物热销榜</div>
+        <div class="pets-subtitle">基于真实成交数据的畅销商品与品类结构 · 点击卡片查看详情，加入对比清单</div>
+      </div>
+      <div class="pets-search">
+        <span>🔍</span>
+        <input id="pets-search-input" type="text" placeholder="搜索商品名称 / 品牌…" oninput="petsFilterCards()">
+      </div>
+    </div>
+
+    <!-- 筛选栏 -->
+    <div class="pets-filterbar">
+      <div class="pets-chips" id="pets-cat-chips"></div>
+      <div class="pets-filter-right">
+        <label class="pets-flabel">排序</label>
+        <select id="pets-sort" class="pets-select" onchange="loadPets()">
+          <option value="sales">按销量</option>
+          <option value="revenue">按销售额</option>
+          <option value="rating">按评分</option>
+          <option value="price">按价格</option>
+        </select>
+        <label class="pets-flabel">榜单</label>
+        <select id="pets-limit" class="pets-select" onchange="loadPets()">
+          <option value="10">Top 10</option>
+          <option value="12" selected>Top 12</option>
+          <option value="20">Top 20</option>
+          <option value="50">Top 50</option>
+        </select>
+        <input id="pets-start" type="date" class="pets-date" onchange="loadPets()">
+        <span class="pets-flabel">至</span>
+        <input id="pets-end" type="date" class="pets-select pets-date" onchange="loadPets()">
+      </div>
+    </div>
+
+    <!-- KPI 卡片 -->
+    <div class="pets-kpis" id="pets-kpis"></div>
+
+    <!-- 主体：左榜单 + 右（占比图 + 对比清单） -->
+    <div class="pets-main">
+      <div class="pets-cards" id="pets-cards"></div>
+      <div class="pets-side">
+        <div class="pets-panel">
+          <div class="pets-panel-title">🍩 品类销售占比</div>
+          <div id="pets-share" class="pets-chart"></div>
+          <div class="pets-share-legend" id="pets-share-legend"></div>
+        </div>
+        <div class="pets-panel pets-compare" id="pets-compare-panel">
+          <div class="pets-panel-title">🧾 已选商品对比清单</div>
+          <div class="pets-compare-body" id="pets-compare-body"></div>
+          <div class="pets-compare-foot" id="pets-compare-foot"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 底部绿色标语块 -->
+    <div class="pets-banner">🐾 基于 48,473 位用户 · 169,708 笔真实订单 · 264.8 万条行为日志的行为洞察 · 数据周期 2017.07 – 2018.10</div>
+  </div>
+
+  <!-- 商品详情弹窗 -->
+  <div class="pets-modal-mask" id="pets-modal-mask" onclick="if(event.target===this)closePetsModal()">
+    <div class="pets-modal">
+      <button class="pets-modal-close" onclick="closePetsModal()">✕</button>
+      <div class="pets-modal-grid">
+        <div class="pets-modal-imgbox"><img id="pm-img" src="" alt="商品图片"></div>
+        <div class="pets-modal-info">
+          <div class="pets-modal-cat" id="pm-cat"></div>
+          <div class="pets-modal-name" id="pm-name"></div>
+          <div class="pets-modal-meta" id="pm-meta"></div>
+          <div class="pets-modal-stats" id="pm-stats"></div>
+        </div>
+      </div>
+      <div class="pets-modal-trend"><div id="pets-trend" class="pets-chart" style="height:220px"></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="page" id="page-recommendation" data-audience="tech">
+  <div class="page-header">
+    <div><div class="page-title">🎯 推荐效果监控</div><div class="page-desc">推荐算法性能追踪、多模型对比与效果趋势分析</div></div>
+    <span class="page-badge" id="rec-badge">监控中</span>
+  </div>
+
+  <!-- Time Filter -->
+  <div class="filter-bar">
+    <span class="filter-label">📅 追踪时段:</span>
+    <input type="date" id="r-start" value="2025-10-01" onchange="loadRecommendation()">
+    <span style="color:var(--text-3)">至</span>
+    <input type="date" id="r-end" value="2026-06-30" onchange="loadRecommendation()">
+    <div class="filter-spacer"></div>
+    <button class="btn btn-export" onclick="exportRecommendation()">📥 导出报告</button>
+    <span class="filter-hint">对比不同时段推荐效果变化</span>
+  </div>
+
+  <!-- KPI row -->
+  <div class="kpi-grid" id="rec-kpi-grid">
+    <div class="kpi-card c1"><div class="kpi-label">👥 覆盖用户</div><div class="kpi-value" id="r-val1">--</div></div>
+    <div class="kpi-card c2"><div class="kpi-label">📦 推荐商品</div><div class="kpi-value" id="r-val2">--</div></div>
+    <div class="kpi-card c3"><div class="kpi-label">🔗 交互日志</div><div class="kpi-value" id="r-val3">--</div></div>
+    <div class="kpi-card c4"><div class="kpi-label">🧪 测试样本</div><div class="kpi-value" id="r-val4">--</div></div>
+    <div class="kpi-card c5"><div class="kpi-label">🏆 最优模型</div><div class="kpi-value" id="r-val5" style="font-size:16px">--</div></div>
+    <div class="kpi-card c6"><div class="kpi-label">🎯 最高F1值</div><div class="kpi-value" id="r-val6">--</div></div>
+  </div>
+
+  <!-- Recommendation trend over time -->
+  <div class="panel">
+    <div class="panel-header"><span class="panel-title">📈 逐月行为转化率（加购 / 收藏）</span><span class="panel-hint" id="r-trend-hint" style="font-size:11px;color:var(--text-3)">站点级行为口径 · 非推荐实验指标</span></div>
+    <div class="panel-body">
+      <div class="chart-lg" id="r-chart-trend"></div>
+      <div class="panel-note cal-tech" style="margin-top:6px;padding:8px 12px;border-radius:6px;background:var(--bg-2,#faf6f2);font-size:11px;line-height:1.7;color:var(--text-3)">
+        <b>口径边界（必读）</b>：① 行为事实表为两源拼接 —— 淘宝 UserBehavior 的浏览/收藏/加购<b>仅覆盖 2017-11 与 2017-12 两个月</b>，2018 年起 16.97 万行全部是 Amazon 评价搬运的「评价」类型，因此本图<b>只有 2 个有效比率点</b>，不构成趋势。② 行为域与订单域为<b>互不相交的用户空间</b>，故不提供跨源支付转化率（历史实现曾算出 52700% 的失真值）。③ 本面板是站点级行为指标，非推荐实验指标。
+      </div>
+    </div>
+  </div>
+
+  <!-- Model comparison chart -->
+  <div class="panel">
+    <div class="panel-header"><span class="panel-title">📊 七维度算法模型对比</span></div>
+    <div class="panel-body"><div class="chart-lg" id="r-chart-compare"></div></div>
+  </div>
+
+  <!-- Model cards -->
+  <div class="row" id="model-cards-row" style="grid-template-columns:repeat(auto-fit,minmax(280px,1fr));margin-bottom:16px"></div>
+
+  <!-- AUC / LogLoss + FM 消融（v2 扩展模型 · 逐点打分口径） -->
+  <div class="row row-2">
+    <div class="panel">
+      <div class="panel-header"><span class="panel-title">📉 AUC / LogLoss 对比（逐点打分口径）</span><span class="panel-hint" style="font-size:11px;color:var(--text-3)">Top-K 指标无法反映 FM 的排序质量</span></div>
+      <div class="panel-body"><div class="chart" id="r-chart-auc"></div></div>
+    </div>
+    <div class="panel">
+      <div class="panel-header"><span class="panel-title">🔬 FM 消融实验（Co-Score / 隐因子）</span><span class="panel-hint" id="r-co-hint">--</span></div>
+      <div class="panel-body"><div class="table-wrap"><table id="tbl-ablation"><thead><tr><th>变体</th><th style="text-align:right">AUC</th><th style="text-align:right">LogLoss</th><th style="text-align:right">ΔAUC</th></tr></thead><tbody></tbody></table></div>
+        <div class="derived-note" id="r-ablation-note"></div></div>
+    </div>
+  </div>
+
+  <!-- Radar + Overall -->
+  <div class="row row-2">
+    <div class="panel"><div class="panel-header"><span class="panel-title">🌐 覆盖率 / 多样性 / 新颖性 雷达图</span></div><div class="panel-body"><div class="chart" id="r-chart-radar"></div></div></div>
+    <div class="panel"><div class="panel-header"><span class="panel-title">🏅 模型综合评分排名</span></div><div class="panel-body"><div class="chart" id="r-chart-rank"></div></div></div>
+  </div>
+</div>
+
+<!-- ====== Page 4: User Behavior Analysis ====== -->
+<div class="page" id="page-users">
+  <div class="page-header">
+    <div><div class="page-title">👥 用户行为分析</div><div class="page-desc">用户画像、转化漏斗与留存分析（技术视角另含路径追踪与热力图）</div></div>
+    <span class="page-badge" id="u-user-badge">👥 用户加载中…</span>
+  </div>
+
+  <!-- Time Filter -->
+  <div class="filter-bar">
+    <span class="filter-label">📅 时间范围:</span>
+    <input type="date" id="u-start" value="2017-07-03" onchange="loadUsers()">
+    <span style="color:var(--text-3)">至</span>
+    <input type="date" id="u-end" value="2018-10-02" onchange="loadUsers()">
+    <select id="u-btype" onchange="loadUsers()"><option value="">全部行为</option><option value="浏览">浏览</option><option value="加购">加购</option><option value="收藏">收藏</option><option value="搜索">搜索</option></select>
+    <div class="filter-spacer"></div>
+    <button class="btn btn-export" onclick="exportUserData()">📥 导出数据</button>
+    <span class="filter-hint">筛选时段内用户行为分析</span>
+  </div>
+
+  <!-- KPI row -->
+  <div class="kpi-grid" id="u-kpi-grid">
+    <div class="kpi-card c1"><div class="kpi-label">👤 活跃用户</div><div class="kpi-value" id="u-val1">--</div><div class="kpi-sub" style="font-size:10px;color:var(--text-3)">行为域（淘宝）口径</div></div>
+    <div class="kpi-card c2"><div class="kpi-label">👀 总浏览(PV)</div><div class="kpi-value" id="u-val2">--</div></div>
+    <div class="kpi-card c3"><div class="kpi-label">⭐ 收藏次数</div><div class="kpi-value" id="u-val3">--</div></div>
+    <div class="kpi-card c4"><div class="kpi-label">🛒 加购率</div><div class="kpi-value" id="u-val4">--</div></div>
+    <div class="kpi-card c5"><div class="kpi-label">📊 转化率</div><div class="kpi-value" id="u-val5">--</div></div>
+    <div class="kpi-card c6"><div class="kpi-label">📈 人均浏览</div><div class="kpi-value" id="u-val6">--</div></div>
+  </div>
+  <div class="filter-hint" id="u-domain-note" style="margin:2px 0 10px">⚠️ 正在核对用户空间口径…</div>
+  <div class="filter-hint" style="margin:0 0 10px">ℹ️ 加购率/转化率为<b>行为域同源</b>口径（加购去重用户 ÷ 浏览去重用户）；跨源比率一律不计算</div>
+
+  <!-- 热门关注商品 TOP20（闭合论文 §8.2 声称口径：此前接口存在但前端未挂载） -->
+  <div class="panel">
+    <div class="panel-header">
+      <span class="panel-title">🔥 热门关注商品 TOP20</span>
+      <span class="panel-hint" style="font-size:11px;color:var(--text-3)">热度代理指标 · 随筛选联动</span>
+    </div>
+    <div class="panel-body">
+      <div class="chart-xl" id="u-chart-hot"></div>
+      <div class="derived-note" id="u-hot-note" style="margin-top:8px"></div>
+    </div>
+  </div>
+
+  <!-- Sankey: User path（技术视角专属：路径验证用途，业务方决策价值低） -->
+  <div class="panel" data-audience="tech">
+    <div class="panel-header"><span class="panel-title">🔀 用户行为路径追踪（桑基图）</span><span class="panel-hint" style="font-size:11px;color:var(--text-3)">行为域仅约 9 个采样日有加购/下单数据</span></div>
+    <div class="panel-body"><div class="chart-xl" id="u-chart-sankey"></div></div>
+  </div>
+
+  <!-- Heatmap + Funnel -->
+  <div class="row row-2">
+    <div class="panel" data-audience="tech">
+      <div class="panel-header"><span class="panel-title">🔥 行为热力图（星期 × 小时）</span><span class="panel-hint" style="font-size:11px;color:var(--text-3)">行为域仅覆盖约 9–35 个采样日，非全周期</span></div>
+      <div class="panel-body"><div class="chart-lg" id="u-chart-heatmap"></div></div>
+    </div>
+    <div class="panel">
+      <div class="panel-header"><span class="panel-title">🔻 用户转化漏斗</span></div>
+      <div class="panel-body"><div class="chart-lg" id="u-chart-funnel"></div></div>
+    </div>
+  </div>
+
+  <!-- Retention cohort -->
+  <div class="panel">
+    <div class="panel-header"><span class="panel-title">📅 月度用户留存队列分析</span><span class="panel-hint" style="font-size:11px;color:var(--text-3)">按首购月分队列 · M0=首购当月</span></div>
+    <div class="panel-body"><div class="chart" id="u-chart-retention"></div><div id="u-retention-table" style="margin-top:12px;overflow-x:auto"></div></div>
+  </div>
+
+  <!-- User profiles -->
+  <div class="row row-2">
+    <div class="panel"><div class="panel-header"><span class="panel-title">📊 RFM 分层消费金额</span></div><div class="panel-body"><div class="chart" id="u-chart-rfm"></div></div></div>
+    <div class="panel"><div class="panel-header"><span class="panel-title">🐱 宠物类型 × 消费对比</span></div><div class="panel-body"><div class="chart" id="u-chart-pet"></div></div></div>
+  </div>
+
+  <div class="row row-3">
+    <div class="panel"><div class="panel-header"><span class="panel-title">⚠️ 维度可用性说明</span></div>
+      <div class="panel-body" style="font-size:12px;line-height:1.9;color:#8a6e5c">
+        以下画像维度在<b>真实数据源中不可用</b>（Amazon 评论源不含相应字段，ETL 统一记为占位常量），
+        按"缺失必须标注"原则此处不绘制图表，避免伪分析：<br>
+        · 城市等级 / 城市 —— 全量「海外」<br>
+        · 年龄 —— 全量 0（未知）<br>
+        · 性别 / 收入层级 / 宠物年龄段 —— 全量「未知」<br>
+        · 支付方式 / 促销名称 —— 全量「未知 / 空」<br>
+        <span style="color:#5c3d2e">可用维度：宠物类型、消费层级、活跃度、RFM 分层。</span>
+      </div></div>
+    <div class="panel"><div class="panel-header"><span class="panel-title">💪 活跃度分层</span></div><div class="panel-body"><div class="chart-sm" id="u-chart-activity"></div></div></div>
+    <div class="panel"><div class="panel-header"><span class="panel-title">💳 消费层级分布</span></div><div class="panel-body"><div class="chart-sm" id="u-chart-consume"></div></div></div>
+  </div>
+
+  <!-- 宠物维度画像（C2 双维画像补救 · 派生推断） -->
+  <div class="panel">
+    <div class="panel-header">
+      <span class="panel-title">🐾 宠物生命阶段画像（派生推断 · 双维画像补救）</span>
+      <span class="panel-hint" id="u-lc-hint">证据覆盖 --</span>
+    </div>
+    <div class="panel-body">
+      <div class="row row-2">
+        <div><div class="chart" id="u-chart-lifecycle"></div></div>
+        <div><div class="chart" id="u-chart-lcswitch"></div></div>
+      </div>
+      <div id="u-lc-stats" style="display:flex;gap:10px;flex-wrap:wrap;margin:10px 0"></div>
+      <div id="u-lc-profile" style="overflow-x:auto"></div>
+      <div class="derived-note" id="u-lc-note"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== Page 6: Temporal Basket Insight (v2) ====== -->
+<div class="page" id="page-basket">
+  <div class="page-header">
+    <div><div class="page-title">🧺 时序购物篮洞察</div><div class="page-desc">跨订单「买 A → 间隔 T 天 → 买 B」时序关联规则 · 消耗周期画像 · 补货候选清单</div></div>
+    <span class="page-badge" id="b-badge">🕐 加载中…</span>
+  </div>
+
+  <div class="filter-bar">
+    <span class="filter-label">🔗 规则最少用户:</span>
+    <select id="b-min-users" onchange="loadBasket()"><option value="30">≥30 用户</option><option value="50">≥50 用户</option><option value="100">≥100 用户</option></select>
+    <span class="filter-label">🕸️ 关系图规模:</span>
+    <select id="b-topn" onchange="loadBasket()"><option value="20">TOP 20</option><option value="40" selected>TOP 40</option><option value="60">TOP 60</option></select>
+    <span class="filter-label">📦 候选类目:</span>
+    <select id="b-cand-cat" onchange="loadBasketCands()"><option value="">全部类目</option></select>
+    <div class="filter-spacer"></div>
+    <button class="btn btn-export" onclick="exportBasket('rules')">📥 导出规则</button>
+    <button class="btn btn-export" onclick="exportBasket('cands')">📥 导出补货候选</button>
+    <span class="filter-hint">规则源自 analytics/temporal_rules.json</span>
+  </div>
+
+  <div class="kpi-grid">
+    <div class="kpi-card c1"><div class="kpi-label">🔗 时序关联规则</div><div class="kpi-value" id="b-k1">--</div><div class="kpi-sub" id="b-k1-sub"></div></div>
+    <div class="kpi-card c2"><div class="kpi-label">⏱️ 平均中位间隔</div><div class="kpi-value" id="b-k2">--</div><div class="kpi-sub" id="b-k2-sub"></div></div>
+    <div class="kpi-card c3"><div class="kpi-label">🔄 周期画像类目</div><div class="kpi-value" id="b-k3">--</div><div class="kpi-sub" id="b-k3-sub"></div></div>
+    <div class="kpi-card c4"><div class="kpi-label">📋 补货候选对象</div><div class="kpi-value" id="b-k4">--</div><div class="kpi-sub" id="b-k4-sub"></div></div>
+    <div class="kpi-card c5"><div class="kpi-label">🥇 规则数最多类目</div><div class="kpi-value" id="b-k5">--</div><div class="kpi-sub" id="b-k5-sub"></div></div>
+    <div class="kpi-card c6"><div class="kpi-label">📅 分析口径</div><div class="kpi-value" id="b-k6">--</div><div class="kpi-sub" id="b-k6-sub"></div></div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-header"><span class="panel-title">🕸️ 类目时序关联网络（边宽 = 时序置信度）</span><span style="font-size:11px;color:var(--text-3)">箭头方向为购买先后</span></div>
+    <div class="panel-body"><div class="chart-xl" id="b-chart-graph"></div></div>
+  </div>
+
+  <div class="row row-2">
+    <div class="panel">
+      <div class="panel-header"><span class="panel-title">📊 类目复购周期分布（柱状=中位数，折线=P25/P75）</span></div>
+      <div class="panel-body"><div class="chart-lg" id="b-chart-cycle"></div></div>
+    </div>
+    <div class="panel">
+      <div class="panel-header"><span class="panel-title">🥇 TOP 时序规则（按支持度）</span></div>
+      <div class="panel-body"><div class="table-wrap"><table id="tbl-basket-rules"><thead><tr><th style="width:40px">#</th><th>前因类目</th><th>后果类目</th><th style="text-align:right">共现用户</th><th style="text-align:right">置信度</th><th style="text-align:right">提升度</th><th style="text-align:right">中位间隔(天)</th></tr></thead><tbody></tbody></table></div></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-header"><span class="panel-title">🎯 补货候选清单（进入补货窗口的高价值用户）</span><span style="font-size:11px;color:var(--text-3)">已过天数 ≥ 周期中位数 × 0.8</span></div>
+    <div class="panel-body"><div class="table-wrap"><table id="tbl-basket-cands"><thead><tr><th style="width:40px">#</th><th>用户ID</th><th>RFM 分层</th><th>二级类目</th><th>上次购买</th><th style="text-align:right">周期(天)</th><th style="text-align:right">已过(天)</th><th style="text-align:right">周期比</th><th>建议商品</th><th style="text-align:right">累计消费</th></tr></thead><tbody></tbody></table></div></div>
+  </div>
+</div>
+
+<!-- ====== Page 7: A/B 模拟实验 (v2 P1-E) ====== -->
+<div class="page" id="page-ab" data-audience="tech">
+  <div class="page-header">
+    <div><div class="page-title">🧪 A/B 模拟实验</div><div class="page-desc">模拟环境中配置并对比多组策略/参数 · 用户级配对 bootstrap 检验 · 固定种子可复现</div></div>
+    <span class="page-badge" id="ab-badge">⚪ 未运行</span>
+  </div>
+
+  <div class="panel">
+    <div class="panel-header"><span class="panel-title">⚙️ 实验配置</span><span style="font-size:11px;color:var(--text-3)">真实锚点 + 显式响应模型（双层口径）</span></div>
+    <div class="panel-body">
+      <div class="filter-bar" style="margin-bottom:14px">
+        <span class="filter-label">🎲 随机种子:</span>
+        <input type="number" id="ab-seed" value="42" min="1" style="width:90px">
+        <span class="filter-label">样本比例:</span>
+        <select id="ab-ratio"><option value="1">100%</option><option value="0.5">50%</option><option value="0.25">25%</option></select>
+        <div class="filter-spacer"></div>
+        <button class="btn" id="ab-run" onclick="runABSim()">▶ 运行模拟实验</button>
+        <span class="filter-hint" id="ab-last">尚未运行</span>
+      </div>
+      <div id="ab-strategies" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px"></div>
+      <div class="derived-note" style="margin-top:12px">
+        <b>⚠ 口径声明：</b>结果分两层——<b>real_hit_rate</b>（真实锚点）由测试期<b>真实购买</b>计算，无模拟成分；
+        <b>sim_ctr / sim_cvr / sim_gmv</b> 由显式响应模型生成（p_click = base_ctr × (1+亲和增益) × (1+周期接近增益) × 位置衰减^位次），为<b>建模假设而非数据事实</b>。
+        策略可见信息仅限训练期（防泄漏）；同 (种子, 策略组) 重跑结果逐位一致。
+      </div>
+    </div>
+  </div>
+
+  <div class="row row-2">
+    <div class="panel"><div class="panel-header"><span class="panel-title">📈 模拟指标对比（CTR / GMV·用户）</span></div><div class="panel-body"><div class="chart" id="ab-chart-metric"></div></div></div>
+    <div class="panel"><div class="panel-header"><span class="panel-title">🎯 真实命中率与多样性</span></div><div class="panel-body"><div class="chart" id="ab-chart-real"></div></div></div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-header"><span class="panel-title">📋 结果明细（含 95% CI 与显著性）</span></div>
+    <div class="panel-body"><div class="table-wrap"><table id="tbl-ab"><thead><tr>
+      <th>策略</th><th style="text-align:right">曝光</th><th style="text-align:right">模拟CTR</th><th style="text-align:right">模拟CVR</th>
+      <th style="text-align:right">GMV/用户</th><th style="text-align:right">真实命中率</th><th style="text-align:right">多样性(类目)</th>
+      <th>vs 基线（GMV/用户）</th></tr></thead><tbody></tbody></table></div></div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-header"><span class="panel-title">💡 实验结论（自动生成）</span></div>
+    <div class="panel-body"><ul id="ab-conclusions" style="margin:0;padding-left:20px;font-size:13px;color:var(--text-2);line-height:2"></ul></div>
+  </div>
+</div>
+
+<div class="footer">🐾 宠物用品电商用户行为分析与智能推荐系统 v2.0 © 2026 | Hadoop/Spark · 数据仓库 · ETL · ML推荐 · BI可视化 🐾</div>
+
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ====== Globals ======
+const charts = {};
+const pageLoaded = {};
+
+// ====== 视图模式：深色主题 / 大屏演示（v1.4.0） ======
+// 图表内硬编码的浅色文本/网格色 → 深色替代色（品牌色与 '#fff' 叠色文本保持不变）
+const CHART_DARK_MAP = {
+  '#8a6e5c':'#c9b6a4','#8A6A50':'#c9b6a4','#8a6a50':'#c9b6a4',
+  '#b8a395':'#8f8073','#B8A395':'#8f8073',
+  '#5c3d2e':'#f2e8dd',
+  '#ece0d4':'#3a322c','#f3ebe0':'#332c26',
+  '#fffdf9':'#221e1a','#fdf8f1':'#221e1a','#f5ede2':'#2b2622','#faf5ef':'#1a1714',
+  '#e8d5b7':'#4a4038'
+};
+function mapChartDark(v){
+  if(typeof v === 'function') return v;
+  if(Array.isArray(v)) return v.map(mapChartDark);
+  if(v && typeof v === 'object'){
+    const proto = Object.getPrototypeOf(v);
+    // 非普通对象（如 echarts.graphic.LinearGradient 实例）原样返回，避免破坏渐变
+    if(proto !== Object.prototype) return v;
+    const o = {};
+    for(const k in v) o[k] = mapChartDark(v[k]);
+    return o;
+  }
+  if(typeof v === 'string') return CHART_DARK_MAP[v] || CHART_DARK_MAP[v.toLowerCase()] || v;
+  return v;
+}
+function isDarkMode(){ return document.body.classList.contains('theme-dark'); }
+function isBigScreen(){ return document.body.classList.contains('bigscreen'); }
+// 包装 echarts.init：深色模式下对 setOption 的配色做一次性映射
+(function patchEchartsTheme(){
+  if(typeof echarts === 'undefined' || echarts.__themePatched) return;
+  echarts.__themePatched = true;
+  const _origInit = echarts.init;
+  echarts.init = function(el, theme, opts){
+    const inst = _origInit.call(echarts, el, theme, opts);
+    const _origSet = inst.setOption.bind(inst);
+    inst.setOption = function(op, notMerge, lazyUpdate){
+      try{ if(isDarkMode()) op = mapChartDark(op); }
+      catch(e){ console.warn('[Theme] 图表配色映射跳过:', e); }
+      return _origSet(op, notMerge, lazyUpdate);
+    };
+    return inst;
+  };
+})();
+function updateViewBtns(){
+  const t=document.getElementById('btn-theme'), b=document.getElementById('btn-bigscreen');
+  if(t){ t.textContent = isDarkMode() ? '☀️ 浅色' : '🌙 深色'; t.classList.toggle('on', isDarkMode()); }
+  if(b){ b.textContent = isBigScreen() ? '⛗ 退出大屏' : '⛶ 大屏'; b.classList.toggle('on', isBigScreen()); }
+}
+function rerenderChartsForTheme(){
+  Object.keys(charts).forEach(k=>{ try{ charts[k] && charts[k].dispose(); }catch(e){} delete charts[k]; });
+  const active = document.querySelector('.page.active');
+  if(!active) return;
+  const page = active.id.replace('page-','');
+  pageLoaded[page] = false;
+  switchPage(page, document.querySelector('.nav-item.active'));
+}
+function toggleTheme(){
+  const dark = !isDarkMode();
+  document.body.classList.toggle('theme-dark', dark);
+  try{ localStorage.setItem('bi_theme', dark?'dark':'light'); }catch(e){}
+  updateViewBtns();
+  rerenderChartsForTheme();
+}
+function toggleBigScreen(){
+  const on = !isBigScreen();
+  document.body.classList.toggle('bigscreen', on);
+  try{ localStorage.setItem('bi_bigscreen', on?'1':'0'); }catch(e){}
+  updateViewBtns();
+  if(on && document.documentElement.requestFullscreen){ document.documentElement.requestFullscreen().catch(()=>{}); }
+  else if(!on && document.fullscreenElement && document.exitFullscreen){ document.exitFullscreen().catch(()=>{}); }
+  setTimeout(()=>{Object.values(charts).forEach(c=>c&&c.resize())},250);
+}
+(function restoreViewMode(){
+  let th='light', bs='0';
+  try{ th=localStorage.getItem('bi_theme')||'light'; bs=localStorage.getItem('bi_bigscreen')||'0'; }catch(e){}
+  if(th==='dark') document.body.classList.add('theme-dark');
+  if(bs==='1') document.body.classList.add('bigscreen');
+  updateViewBtns();
+  document.addEventListener('keydown', e=>{
+    if(e.target && /INPUT|SELECT|TEXTAREA/.test(e.target.tagName)) return;
+    if(e.key==='d'||e.key==='D') toggleTheme();
+    if(e.key==='b'||e.key==='B') toggleBigScreen();
+  });
+})();
+const colors = ['#d4763a','#c8534e','#7ba05b','#e8a04a','#6ba89a','#a0688a','#d4a045','#8b5e3c'];
+const metricNames = {precision:'准确率',recall:'召回率',f1:'F1值',hit_rate:'命中率',coverage:'覆盖率',diversity:'多样性',novelty:'新颖性'};
+
+function getVal(id){ return document.getElementById(id).value; }
+
+function showToast(msg, type='success'){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'toast ' + type; t.style.display = 'block';
+  setTimeout(()=>{t.style.display='none'}, 2500);
+}
+
+function switchPage(page, el){
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  if(el) el.classList.add('active');
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  // 首次显示该页面时才加载数据，避免反复切换造成重复初始化与重复请求
+  if(!pageLoaded[page]){
+    pageLoaded[page] = true;
+    if(page==='dashboard') loadDashboard();
+    if(page==='products') loadProducts();
+    if(page==='recommendation') loadRecommendation();
+    if(page==='users') loadUsers();
+    if(page==='pets') loadPets();
+    if(page==='basket') loadBasket();
+    if(page==='ab') initABPage();
+  }
+  setTimeout(()=>{Object.values(charts).forEach(c=>c&&c.resize())}, 150);
+}
+
+function initChart(id){
+  if(typeof echarts === 'undefined'){
+    console.error('[ECharts] 依赖未加载，无法渲染图表:', id);
+    return null;
+  }
+  const dom = document.getElementById(id);
+  if(!dom){
+    console.warn('[ECharts] 未找到容器元素:', id);
+    return null;
+  }
+  if(dom.clientWidth === 0 || dom.clientHeight === 0){
+    console.warn('[ECharts] 容器宽高为 0（页面可能未激活），图表将延迟渲染:', id);
+  }
+  if(charts[id]) charts[id].dispose();
+  const c = echarts.init(dom);
+  charts[id] = c;
+  return c;
+}
+
+// Warm chart defaults
+function baseOpt(){ return {tooltip:{backgroundColor:'#fffdf9',borderColor:'#ece0d4',textStyle:{color:'#5c3d2e'}}}; }
+function warmAxis(){ return {axisLine:{lineStyle:{color:'#ece0d4'}},axisLabel:{color:'#b8a395'},splitLine:{lineStyle:{color:'#f3ebe0'}}}; }
+
+// ====== Export function ======
+async function exportData(api, extraParams, name){
+  showToast('正在生成导出文件...');
+  try {
+    let url = '/api/'+api+'?';
+    if(extraParams){
+      Object.entries(extraParams).forEach(([k,v])=>{ if(v) url += k+'='+encodeURIComponent(v)+'&'; });
+    }
+    const data = await fetch(url).then(r=>r.json());
+    if(data.error){ showToast(data.error, 'error'); return; }
+    const rows = Array.isArray(data) ? data : [];
+    if(!rows.length){ showToast('无数据可导出', 'error'); return; }
+    const csv = '\ufeff' + Object.keys(rows[0]).join(',') + '\n' +
+      rows.map(r=>Object.values(r).map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n');
+    const blob = new Blob([csv],{type:'text/csv;charset=utf-8'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = (name||'export')+'_'+new Date().toISOString().slice(0,10)+'.csv';
+    a.click();
+    URL.revokeObjectURL(a.href);
+    showToast('导出成功 ('+rows.length+' 条记录)');
+  } catch(e){ showToast('导出失败: '+e.message, 'error'); }
+}
+
+async function exportRecommendation(){
+  const data = await fetch('/api/recommendation_stats').then(r=>r.json());
+  if(data.error){ showToast('无推荐数据', 'error'); return; }
+  const results = data.results||{};
+  const rows = [];
+  Object.entries(results).forEach(([name,r])=>{
+    rows.push({模型:name,准确率:r.precision,召回率:r.recall,F1值:r.f1,命中率:r.hit_rate,覆盖率:r.coverage,多样性:r.diversity,新颖性:r.novelty});
+  });
+  if(!rows.length){ showToast('无数据', 'error'); return; }
+  const csv = '\ufeff' + Object.keys(rows[0]).join(',') + '\n' +
+    rows.map(r=>Object.values(r).map(v=>'"'+String(v)+'"').join(',')).join('\n');
+  const blob = new Blob([csv],{type:'text/csv;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = '推荐模型效果对比_'+new Date().toISOString().slice(0,10)+'.csv';
+  a.click();
+  URL.revokeObjectURL(a.href);
+  showToast('导出成功 ('+rows.length+' 个模型)');
+}
+
+async function exportUserData(){
+  const start = getVal('u-start'), end = getVal('u-end');
+  const funnel = await fetch('/api/conversion_funnel?start='+start+'&end='+end).then(r=>r.json());
+  const rows = funnel.stages.map((s,i)=>({阶段:s,用户数:funnel.counts[i],转化率:funnel.rates[i]+'%'}));
+  const csv = '\ufeff' + Object.keys(rows[0]).join(',') + '\n' +
+    rows.map(r=>Object.values(r).map(v=>'"'+String(v)+'"').join(',')).join('\n');
+  const blob = new Blob([csv],{type:'text/csv;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = '用户转化漏斗_'+new Date().toISOString().slice(0,10)+'.csv';
+  a.click();
+  URL.revokeObjectURL(a.href);
+  showToast('导出成功');
+}
+
+// ====== Page 1: Dashboard ======
+async function loadDashboard(){
+  const ov = await fetch('/api/overview').then(r=>r.json());
+  document.getElementById('kpi-users').textContent = ov.total_users.toLocaleString();
+  document.getElementById('kpi-users-sub').textContent = '覆盖养宠消费人群';
+  document.getElementById('kpi-orders').textContent = ov.total_orders.toLocaleString();
+  document.getElementById('kpi-orders-sub').textContent = '日均 '+(ov.total_orders/365).toFixed(0)+' 单';
+  document.getElementById('kpi-revenue').textContent = '¥'+(ov.total_revenue/10000).toFixed(0)+'万';
+  document.getElementById('kpi-revenue-sub').textContent = '客单价 ¥'+(ov.total_revenue/ov.total_orders).toFixed(0);
+  document.getElementById('kpi-products').textContent = ov.total_products.toLocaleString();
+  document.getElementById('kpi-products-sub').textContent = '在售商品';
+  document.getElementById('kpi-repurchase').textContent = ov.repurchase_rate+'%';
+  document.getElementById('kpi-repurchase-sub').textContent = ov.repurchase_users.toLocaleString()+' 人复购';
+  document.getElementById('kpi-reviews').textContent = ov.total_reviews.toLocaleString();
+  document.getElementById('kpi-reviews-sub').textContent = '真实用户评价';
+
+  const sales = await fetch('/api/sales_trend?days=0').then(r=>r.json());
+  const c1 = initChart('chart-sales');
+  c1.setOption({...baseOpt(),
+    legend:{data:['销售额','订单数'],bottom:0,textStyle:{fontSize:11,color:'#8a6e5c'}},
+    grid:{left:70,right:60,top:20,bottom:40},
+    xAxis:{type:'category',data:sales.map(s=>s.date_str.slice(5)),...warmAxis(),axisLabel:{rotate:45,fontSize:9,color:'#b8a395'}},
+    yAxis:[{type:'value',name:'元',...warmAxis(),axisLabel:{formatter:v=>(v/10000).toFixed(0)+'万',fontSize:10,color:'#b8a395'}},{type:'value',name:'单',...warmAxis()}],
+    series:[
+      {name:'销售额',type:'line',smooth:true,data:sales.map(s=>s.revenue),areaStyle:{color:new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'rgba(212,118,58,0.25)'},{offset:1,color:'rgba(212,118,58,0.01)'}])},lineStyle:{width:2,color:'#d4763a'},itemStyle:{color:'#d4763a'},symbol:'none'},
+      {name:'订单数',type:'line',yAxisIndex:1,smooth:true,data:sales.map(s=>s.order_count),lineStyle:{width:2,color:'#c8534e'},itemStyle:{color:'#c8534e'},symbol:'none'}
+    ]
+  });
+
+  const behav = await fetch('/api/behavior_trend?days=0').then(r=>r.json());
+  const c2 = initChart('chart-behavior');
+  c2.setOption({...baseOpt(),
+    legend:{data:['PV','UV','加购','收藏'],bottom:0,textStyle:{fontSize:11,color:'#8a6e5c'}},
+    grid:{left:60,right:30,top:20,bottom:40},
+    xAxis:{type:'category',data:behav.map(b=>b.date_str.slice(5)),...warmAxis(),axisLabel:{rotate:45,fontSize:9,color:'#b8a395'}},
+    yAxis:{type:'value',...warmAxis()},
+    series:[
+      {name:'PV',type:'line',smooth:true,data:behav.map(b=>b.pv),areaStyle:{opacity:0.1},lineStyle:{color:'#d4763a'},itemStyle:{color:'#d4763a'},symbol:'none'},
+      {name:'UV',type:'line',smooth:true,data:behav.map(b=>b.uv),lineStyle:{color:'#c8534e'},itemStyle:{color:'#c8534e'},symbol:'none'},
+      {name:'加购',type:'line',smooth:true,data:behav.map(b=>b.cart_add_count),lineStyle:{color:'#e8a04a'},itemStyle:{color:'#e8a04a'},symbol:'none'},
+      {name:'收藏',type:'line',smooth:true,data:behav.map(b=>b.collect_count),lineStyle:{color:'#7ba05b'},itemStyle:{color:'#7ba05b'},symbol:'none'}
+    ]
+  });
+
+  const profile = await fetch('/api/user_profile').then(r=>r.json());
+  initChart('chart-pet').setOption({...baseOpt(),series:[{type:'pie',radius:['40%','68%'],label:{fontSize:10,color:'#8a6e5c'},data:profile.pet_type.map(p=>({name:p.pet_type,value:p.cnt})),itemStyle:{borderRadius:6,borderColor:'#fffdf9',borderWidth:2}}],color:colors});
+
+  const rfm = await fetch('/api/rfm_analysis').then(r=>r.json());
+  const rfmColors = {'高价值客户':'#c8534e','重要发展客户':'#e8a04a','一般客户':'#d4763a','低价值客户':'#a0688a','流失客户':'#b8a395'};
+  initChart('chart-rfm').setOption({...baseOpt(),series:[{type:'pie',radius:'65%',label:{formatter:'{b}\n{d}%',fontSize:10,color:'#8a6e5c'},data:rfm.map(r=>({name:r.rfm_segment,value:r.cnt,itemStyle:{color:rfmColors[r.rfm_segment]||'#d4763a'}}))}]});
+
+  // 消费层级（原"城市等级分布"已下线：真实数据源为 Amazon 评论，无地域字段，
+  // city_tier 全量为常量「海外」，饼图只剩一个扇区、零信息量且涉嫌"伪分析"；
+  // 按数据铁律改为展示真实可用的消费层级，并在卡头标注替换原因）
+  initChart('chart-city').setOption({...baseOpt(),series:[{type:'pie',radius:'65%',roseType:'area',label:{fontSize:10,color:'#8a6e5c',formatter:'{b}\n{d}%'},data:profile.consume_level.map(c=>({name:c.consume_level,value:c.cnt}))}],color:['#d4763a','#e8a04a','#d4a045','#e8d5b7','#f3ebe0']});
+
+  const hour = await fetch('/api/heatmap').then(r=>r.json());
+  initChart('chart-hour').setOption({...baseOpt(),
+    grid:{left:50,right:50,top:20,bottom:30},
+    xAxis:{type:'category',data:hour.map(h=>h.order_hour+'时'),...warmAxis(),axisLabel:{fontSize:10,color:'#b8a395'}},
+    yAxis:{type:'value',name:'行为次数',...warmAxis()},
+    series:[{type:'bar',data:hour.map(h=>h.cnt),barWidth:'60%',itemStyle:{color:new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'#e8a04a'},{offset:1,color:'#d4763a'}]),borderRadius:[4,4,0,0]},label:{show:true,position:'top',fontSize:9,color:'#b8a395'}}]
+  });
+
+  const cat = await fetch('/api/category_sales').then(r=>r.json());
+  const catMap = {}; cat.forEach(c=>{catMap[c.main_category]=(catMap[c.main_category]||0)+c.revenue});
+  const sortedCats = Object.entries(catMap).sort((a,b)=>b[1]-a[1]);
+  initChart('chart-cat').setOption({...baseOpt(),
+    grid:{left:90,right:80,top:20,bottom:20},
+    xAxis:{type:'value',...warmAxis(),axisLabel:{formatter:v=>(v/10000).toFixed(0)+'万',fontSize:10,color:'#b8a395'}},
+    yAxis:{type:'category',data:sortedCats.map(c=>c[0]).reverse(),axisLabel:{fontSize:11,color:'#8a6e5c'}},
+    series:[{type:'bar',data:sortedCats.map(c=>c[1]).reverse(),barWidth:'50%',itemStyle:{color:new echarts.graphic.LinearGradient(1,0,0,0,[{offset:0,color:'#7ba05b'},{offset:1,color:'#d4763a'}]),borderRadius:[0,4,4,0]},label:{show:true,position:'right',formatter:p=>(p.value/10000).toFixed(0)+'万',fontSize:10,color:'#8a6e5c'}}]
+  });
+}
+
+// ====== Page 2: Products (full implementation) ======
+async function loadProducts(){
+  const start = getVal('p-start'), end = getVal('p-end'), cat = getVal('p-category');
+
+  // Sales trend (filterable)
+  const trend = await fetch('/api/product_sales_trend?start='+start+'&end='+end+'&category='+cat).then(r=>r.json());
+  const tDates = trend.map(t=>t.date_str.slice(5));
+  const tRev = trend.map(t=>t.revenue);
+  const tQty = trend.map(t=>t.sales_quantity);
+  const c1 = initChart('p-chart-trend');
+  c1.setOption({...baseOpt(),
+    legend:{data:['销售额','销量'],bottom:0,textStyle:{fontSize:11,color:'#8a6e5c'}},
+    grid:{left:70,right:60,top:20,bottom:40},
+    xAxis:{type:'category',data:tDates,...warmAxis(),axisLabel:{rotate:45,fontSize:9,color:'#b8a395'}},
+    yAxis:[{type:'value',name:'元',...warmAxis(),axisLabel:{formatter:v=>(v/10000).toFixed(0)+'万',fontSize:10,color:'#b8a395'}},{type:'value',name:'件',...warmAxis()}],
+    series:[
+      {name:'销售额',type:'bar',data:tRev,barWidth:'60%',itemStyle:{color:new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'rgba(212,118,58,0.7)'},{offset:1,color:'rgba(212,118,58,0.2)'}]),borderRadius:[4,4,0,0]}},
+      {name:'销量',type:'line',yAxisIndex:1,smooth:true,data:tQty,lineStyle:{width:2,color:'#c8534e'},itemStyle:{color:'#c8534e'},symbol:'none'}
+    ]
+  });
+
+  // Treemap for category —— 随筛选联动（原为 dim_product 累计字段，改筛选后图不动）
+  const catDetail = await fetch('/api/category_detail?start='+start+'&end='+end+'&category='+cat).then(r=>r.json());
+  const mainCatColor = {'猫用品':'#a0688a','狗用品':'#c8534e','小宠用品':'#e8a04a','通用用品':'#7ba05b','水族用品':'#6ba89a','鸟类用品':'#d4a045'};
+  const tmData = catDetail.map(c=>({name:c.sub_category,value:c.revenue,itemStyle:{color:mainCatColor[c.main_category]||'#d4763a'}}));
+  const c2 = initChart('p-chart-treemap');
+  c2.setOption({...baseOpt(),tooltip:{...baseOpt().tooltip,formatter:p=>p.name+'<br/>销售额: ¥'+(p.value/10000).toFixed(1)+'万'},
+    series:[{type:'treemap',data:tmData,label:{fontSize:11,color:'#fff',fontWeight:600},upperLabel:{show:true,height:25,fontSize:13,color:'#8a6e5c'},breadcrumb:{show:false}}]
+  });
+
+  // Product detail (filterable by time range)
+  const detail = await fetch('/api/product_sales_detail?start='+start+'&end='+end+'&category='+cat+'&limit=30').then(r=>r.json());
+  // KPI 用全量汇总接口，避免被明细 LIMIT 截断（明细列表仅用于表格展示）
+  const summary = await fetch('/api/product_summary?start='+start+'&end='+end+'&category='+cat).then(r=>r.json());
+  const tbody = document.querySelector('#tbl-products tbody');
+  tbody.innerHTML = detail.map((p,i)=>{
+    const rc = i<3?'rank-'+(i+1):'';
+    const rb = i<3?`<span class="rank-badge ${rc}">${i+1}</span>`:`<span class="rank-badge" style="background:#f3ebe0;color:#b8a395">${i+1}</span>`;
+    const stars = '★'.repeat(Math.round(p.avg_rating||0))+'☆'.repeat(5-Math.round(p.avg_rating||0));
+    const ct = p.main_category==='猫用品'?'tag-purple':p.main_category==='狗用品'?'tag-pink':p.main_category==='小宠用品'?'tag-orange':'tag-green';
+    return `<tr><td>${rb}</td><td style="font-weight:600">${p.product_name}</td><td><span class="tag ${ct}">${p.main_category}/${p.sub_category}</span></td><td style="text-align:right">¥${(p.price||0).toFixed(0)}</td><td style="text-align:right;font-weight:700;color:#d4763a">${p.sales_quantity}</td><td style="text-align:right">¥${(p.revenue/10000).toFixed(1)}万</td><td style="text-align:center"><span class="rating-stars">${stars}</span><br><span style="font-size:10px;color:#b8a395">${(p.avg_rating||0).toFixed(1)}</span></td><td style="text-align:right">${p.user_count}</td></tr>`;
+  }).join('');
+
+  // KPIs
+  const totalRev = trend.reduce((s,t)=>s+t.revenue,0);
+  const totalQty = trend.reduce((s,t)=>s+t.sales_quantity,0);
+  const totalOrders = trend.reduce((s,t)=>s+t.order_count,0);
+  const uniqueProducts = summary.unique_products || 0;
+  const uniqueBrands = summary.unique_brands || 0;
+  const avgRating = summary.avg_rating || 0;
+  const avgAov = totalOrders>0 ? (totalRev/totalOrders).toFixed(0) : 0;
+  document.getElementById('p-val1').textContent = uniqueProducts;
+  document.getElementById('p-val2').textContent = totalOrders.toLocaleString();
+  document.getElementById('p-val3').textContent = '¥'+(totalRev/10000).toFixed(0)+'万';
+  document.getElementById('p-val4').textContent = uniqueBrands;
+  document.getElementById('p-val5').textContent = avgRating.toFixed(1);
+  document.getElementById('p-val6').textContent = '¥'+avgAov;
+  const pb = document.getElementById('prod-badge');
+  if(pb && summary.unique_products != null) pb.textContent = '📦 ' + summary.unique_products.toLocaleString() + ' 个动销商品';
+
+  // Brand chart —— 随筛选联动
+  const brands = await fetch('/api/brand_analysis?start='+start+'&end='+end+'&category='+cat).then(r=>r.json());
+  const topBrands = brands.slice(0,15);
+  const c3 = initChart('p-chart-brand');
+  c3.setOption({...baseOpt(),
+    grid:{left:80,right:60,top:20,bottom:20},
+    xAxis:{type:'value',...warmAxis(),axisLabel:{formatter:v=>(v/10000).toFixed(0)+'万',fontSize:10,color:'#b8a395'}},
+    yAxis:{type:'category',data:topBrands.map(b=>b.brand).reverse(),axisLabel:{fontSize:11,color:'#8a6e5c'}},
+    series:[{type:'bar',data:topBrands.map(b=>b.total_revenue).reverse(),barWidth:'55%',itemStyle:{color:new echarts.graphic.LinearGradient(1,0,0,0,[{offset:0,color:'#c8534e'},{offset:1,color:'#a0688a'}]),borderRadius:[0,4,4,0]},label:{show:true,position:'right',formatter:p=>(p.value/10000).toFixed(0)+'万',fontSize:9,color:'#8a6e5c'}}]
+  });
+
+  // Price distribution — 商品数是全周期属性维度，但该价格段的"销售额"已按筛选期聚合
+  const priceData = await fetch('/api/price_distribution?start='+start+'&end='+end+'&category='+cat).then(r=>r.json());
+  const c4 = initChart('p-chart-price');
+  c4.setOption({...baseOpt(),
+    legend:{bottom:0,fontSize:10,textStyle:{color:'#8a6e5c'}},
+    tooltip:{trigger:'item',formatter:p=>p.name+'<br/>'+
+      '商品数 '+p.value+' 件<br/>筛选期销售额 ¥'+
+      (((priceData.find(x=>x.price_range===p.name)||{}).period_revenue)||0).toLocaleString()},
+    series:[{type:'pie',radius:['35%','65%'],label:{fontSize:10,color:'#8a6e5c',formatter:'{b}\n({d}%)'},data:priceData.map(p=>({name:p.price_range,value:p.product_count})),itemStyle:{borderRadius:6,borderColor:'#fffdf9',borderWidth:2}}],color:colors});
+
+  // Category detail stacked bar
+  const subCats = [...new Set(catDetail.map(c=>c.sub_category))];
+  const mainCats = [...new Set(catDetail.map(c=>c.main_category))];
+  const c5 = initChart('p-chart-cat');
+  c5.setOption({...baseOpt(),
+    legend:{data:mainCats,bottom:0,fontSize:10,textStyle:{color:'#8a6e5c'}},
+    grid:{left:60,right:20,top:20,bottom:50},
+    xAxis:{type:'category',data:subCats,...warmAxis(),axisLabel:{rotate:45,fontSize:8,color:'#b8a395'}},
+    yAxis:{type:'value',name:'收入(元)',...warmAxis(),axisLabel:{formatter:v=>(v/10000).toFixed(0)+'万',fontSize:10,color:'#b8a395'}},
+    series:mainCats.map((mc,idx)=>({name:mc,type:'bar',stack:'total',emphasis:{focus:'series'},itemStyle:{color:colors[idx]},data:subCats.map(sc=>{const f=catDetail.find(c=>c.sub_category===sc&&c.main_category===mc);return f?f.revenue:0})}))
+  });
+
+  // Rating distribution
+  const ratingData = await fetch('/api/rating_distribution').then(r=>r.json());
+  const c6 = initChart('p-chart-rating');
+  c6.setOption({...baseOpt(),
+    grid:{left:60,right:30,top:20,bottom:30},
+    xAxis:{type:'category',data:ratingData.map(r=>r.rating_range),...warmAxis()},
+    yAxis:{type:'value',name:'商品数',...warmAxis()},
+    series:[{type:'bar',data:ratingData.map(r=>r.product_count),barWidth:'50%',itemStyle:{color:new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'#e8a04a'},{offset:1,color:'#d4a045'}]),borderRadius:[4,4,0,0]},label:{show:true,position:'top',fontSize:10,color:'#8a6e5c'}}]
+  });
+}
+
+// ====== Page 3: Recommendation (full implementation) ======
+async function loadRecommendation(){
+  const start = getVal('r-start'), end = getVal('r-end');
+
+  // 模型评估结果：KPI 与模型对比表共用，提前获取（真实评估口径）
+  const data = await fetch('/api/recommendation_stats').then(r=>r.json());
+  // 综合得分权重：以后端下发的 score_weights 为单一权威出处，
+  // 避免权重硬编码在 JS 里与论文口径脱节（审计遗留项 #7）
+  const SW = data.score_weights || {f1:0.30,hit_rate:0.20,coverage:0.20,diversity:0.15,novelty:0.15};
+  const scoreOf = r => (r.f1||0)*SW.f1 + (r.hit_rate||0)*SW.hit_rate +
+                       (r.coverage||0)*SW.coverage + (r.diversity||0)*SW.diversity +
+                       (r.novelty||0)*SW.novelty;
+
+  // 逐期行为转化率（月度口径，读 ADS 预聚合表 ads_behavior_monthly）
+  // ⚠ 数据源边界：fact_user_behavior 是两源拼接，淘宝行为（浏览/收藏/加购）
+  //   只存在于 2017-11/12 两个月，2018 年起全是 Amazon 搬运的「评价」行。
+  //   所以这里的加购率/收藏率**在数学上只有 2 个有效期**，不是实现缺陷，
+  //   必须显式标注，否则读者会误以为是一条可读的趋势。
+  // ⚠ 跨源比率（支付转化/下单转化）已在后端下线：订单域与行为域用户空间
+  //   互不相交，paid/browse 没有业务含义（历史值曾达 52700%）。
+  const dailyRaw = await fetch('/api/recommendation_daily?start='+start+'&end='+end+'&bucket=month').then(r=>r.json());
+  const daily = Array.isArray(dailyRaw) ? dailyRaw : (dailyRaw.data || []);
+  const dates = daily.map(d=>d.period);
+  const behMonths = (dailyRaw && dailyRaw.behavior_months) || [];
+  const validN = daily.filter(d=>d.ctr!=null).length;
+  const hintEl = document.getElementById('r-trend-hint');
+  if(hintEl){
+    hintEl.textContent = behMonths.length
+      ? `行为域仅 ${behMonths.join('、')} 共 ${behMonths.length} 期有浏览/加购数据（共 ${validN} 个有效比率点）；跨源比率不可用`
+      : '行为域数据不可用';
+  }
+  const c0 = initChart('r-chart-trend');
+  c0.setOption({...baseOpt(),
+    title:{text: validN ? `行为域加购/收藏率（仅 ${validN} 期有效）` : '行为域加购/收藏率',
+           left:'center',top:0,textStyle:{fontSize:12,color:'#8a6e5c',fontWeight:'normal'}},
+    legend:{data:['加购率','收藏率'],bottom:0,textStyle:{fontSize:11,color:'#8a6e5c'}},
+    grid:{left:60,right:30,top:34,bottom:40},
+    xAxis:{type:'category',data:dates,...warmAxis(),axisLabel:{rotate:0,fontSize:10,color:'#b8a395'}},
+    yAxis:{type:'value',name:'%',...warmAxis()},
+    series:[
+      {name:'加购率',type:'bar',barWidth:'26%',data:daily.map(d=>d.ctr==null?null:d.ctr),itemStyle:{color:'#d4763a',borderRadius:[4,4,0,0]},label:{show:true,position:'top',fontSize:9,color:'#8a6e5c',formatter:p=>p.value==null?'':p.value+'%'}},
+      {name:'收藏率',type:'bar',barWidth:'26%',data:daily.map(d=>d.collect_rate==null?null:d.collect_rate),itemStyle:{color:'#e8a04a',borderRadius:[4,4,0,0]},label:{show:true,position:'top',fontSize:9,color:'#8a6e5c',formatter:p=>p.value==null?'':p.value+'%'}}
+    ]
+  });
+
+  // KPIs —— 全部取自真实评估结果 data_stats，替代原硬编码模拟值（2,000/178,141/4,890）
+  const stats = data.data_stats||{};
+  const fmtN = v => (v==null ? '--' : Number(v).toLocaleString());
+  document.getElementById('r-val1').textContent = fmtN(stats.users);
+  document.getElementById('r-val2').textContent = fmtN(stats.products);
+  document.getElementById('r-val3').textContent = fmtN(stats.interactions);
+  document.getElementById('r-val4').textContent = fmtN(stats.test);
+
+  // Model evaluation (static results)
+  if(data.error){ document.getElementById('rec-badge').textContent='未生成'; return; }
+  document.getElementById('rec-badge').textContent = data.evaluation_time||'已评估';
+  const results = data.results||{};
+  const models = Object.keys(results);
+  if(!models.length) return;
+
+  let bestModel='', bestF1=0;
+  models.forEach(m=>{if((results[m].f1||0)>bestF1){bestF1=results[m].f1;bestModel=m;}});
+  document.getElementById('r-val5').textContent = bestModel;
+  document.getElementById('r-val6').textContent = bestF1.toFixed(4);
+
+  // Comparison chart
+  const metrics = ['precision','recall','f1','hit_rate','coverage','diversity','novelty'];
+  const c1 = initChart('r-chart-compare');
+  c1.setOption({...baseOpt(),
+    legend:{data:models,bottom:0,fontSize:11,textStyle:{color:'#8a6e5c'}},
+    grid:{left:60,right:20,top:20,bottom:60},
+    xAxis:{type:'category',data:metrics.map(m=>metricNames[m]),...warmAxis(),axisLabel:{fontSize:10,color:'#8a6e5c'}},
+    yAxis:{type:'value',max:1,...warmAxis()},
+    series:models.map((m,idx)=>({name:m,type:'bar',itemStyle:{color:colors[idx%colors.length],borderRadius:[3,3,0,0]},data:metrics.map(k=>+(results[m][k]||0).toFixed(4))}))
+  });
+
+  // Model cards
+  const cardsRow = document.getElementById('model-cards-row');
+  cardsRow.innerHTML = models.map(m=>{
+    const r = results[m]; const isBest = m===bestModel;
+    return `<div class="model-card ${isBest?'best':''}"><div class="model-name">${isBest?'<span class="badge-best">BEST</span> ':''}${m}</div><div class="model-metrics">
+      <div class="metric-item"><span class="metric-label">准确率</span><span class="metric-value">${(r.precision*100).toFixed(2)}%</span></div>
+      <div class="metric-item"><span class="metric-label">召回率</span><span class="metric-value">${(r.recall*100).toFixed(2)}%</span></div>
+      <div class="metric-item"><span class="metric-label">F1值</span><span class="metric-value ${isBest?'high':''}">${r.f1.toFixed(4)}</span></div>
+      <div class="metric-item"><span class="metric-label">命中率</span><span class="metric-value">${(r.hit_rate*100).toFixed(1)}%</span></div>
+      <div class="metric-item"><span class="metric-label">覆盖率</span><span class="metric-value">${(r.coverage*100).toFixed(1)}%</span></div>
+      <div class="metric-item"><span class="metric-label">多样性</span><span class="metric-value">${r.diversity.toFixed(3)}</span></div>
+      <div class="metric-item"><span class="metric-label">新颖性</span><span class="metric-value">${r.novelty.toFixed(3)}</span></div>
+      <div class="metric-item"><span class="metric-label">综合得分</span><span class="metric-value ${scoreOf(r)>0.3?'high':''}">${(scoreOf(r)*100).toFixed(1)}</span></div>
+    </div></div>`;
+  }).join('');
+
+  // AUC / LogLoss（逐点打分口径）——FM 系列的核心评估维度，Top-K 指标下被低估
+  const auc = data.auc_results || {};
+  const aucKeys = Object.keys(auc);
+  if(aucKeys.length){
+    const cAuc = initChart('r-chart-auc');
+    cAuc.setOption({...baseOpt(),
+      legend:{data:['AUC','LogLoss'],bottom:0,textStyle:{fontSize:11,color:'#8a6e5c'}},
+      grid:{left:55,right:55,top:20,bottom:45},
+      xAxis:{type:'category',data:aucKeys,...warmAxis(),axisLabel:{rotate:20,fontSize:9,color:'#8a6e5c'}},
+      yAxis:[{type:'value',name:'AUC',min:0.5,max:1,...warmAxis()},
+             {type:'value',name:'LogLoss',...warmAxis()}],
+      series:[
+        {name:'AUC',type:'bar',data:aucKeys.map(k=>auc[k].auc),barWidth:'48%',
+         itemStyle:{color:p=>p.value>=0.85?'#7ba05b':'#d4763a',borderRadius:[4,4,0,0]},
+         label:{show:true,position:'top',fontSize:10,color:'#8a6e5c',formatter:p=>p.value.toFixed(4)}},
+        {name:'LogLoss',type:'line',yAxisIndex:1,data:aucKeys.map(k=>auc[k].logloss),
+         lineStyle:{width:2,color:'#c8534e'},itemStyle:{color:'#c8534e'},symbol:'circle',symbolSize:6}
+      ]
+    });
+
+    // 消融表：以 FM (w/o Co-Score) 为参照基线
+    const refKey = 'FM (w/o Co-Score)';
+    const refAuc = auc[refKey] ? auc[refKey].auc : null;
+    document.querySelector('#tbl-ablation tbody').innerHTML = aucKeys.map(k=>{
+      const a = auc[k] || {};
+      let d = '<span style="color:#b8a395">—</span>';
+      if(refAuc != null && k !== refKey){
+        const dv = (a.auc||0) - refAuc;
+        const col = dv>0 ? '#7ba05b' : (dv<0 ? '#c8534e' : '#8a6e5c');
+        d = '<span style="color:'+col+';font-weight:600">'+(dv>0?'+':'')+dv.toFixed(4)+'</span>';
+      } else if(k === refKey){ d = '<span style="color:#8a6e5c">参照基线</span>'; }
+      return '<tr><td>'+k+'</td><td style="text-align:right;font-weight:600">'+(a.auc!=null?a.auc.toFixed(4):'--')+
+             '</td><td style="text-align:right">'+(a.logloss!=null?a.logloss.toFixed(4):'--')+
+             '</td><td style="text-align:right">'+d+'</td></tr>';
+    }).join('');
+
+    const co = data.co_score_stats || {};
+    if(co.coverage != null){
+      document.getElementById('r-co-hint').textContent =
+        'Co-Score 覆盖 ' + (co.coverage*100).toFixed(2) + '%（' +
+        (co.covered||0).toLocaleString() + ' / ' + (co.pairs||0).toLocaleString() + ' 对）';
+    }
+    const ab = data.ablation_summary || {};
+    document.getElementById('r-ablation-note').innerHTML =
+      '口径：ΔAUC 以 <b>FM (w/o Co-Score)</b> 为参照；LogLoss 越低越好。' +
+      (ab.co_score_gain_auc != null
+        ? ' Co-Score 净贡献 ΔAUC = <b>' + ab.co_score_gain_auc.toFixed(4) +
+          '</b>（pooled 口径为负），但在 Top-K 场景中 RulesBoost 的 P@10 为热度基线的 3 倍——' +
+          '时序信号是<b>长尾补货的排序先验</b>，而非通用逐点打分特征。'
+        : '');
+  }
+
+  // Radar
+  const c2 = initChart('r-chart-radar');
+  c2.setOption({...baseOpt(),
+    legend:{data:models,bottom:0,fontSize:10,textStyle:{color:'#8a6e5c'}},
+    radar:{indicator:[{name:'覆盖率',max:1},{name:'多样性',max:1},{name:'新颖性',max:1},{name:'命中率',max:0.1},{name:'F1值',max:0.01}],axisName:{color:'#8a6e5c'},splitLine:{lineStyle:{color:'#ece0d4'}},splitArea:{areaStyle:{color:['#fffdf9','#f5ede2']}}},
+    series:[{type:'radar',data:models.map((m,idx)=>({name:m,value:[results[m].coverage,results[m].diversity,results[m].novelty,results[m].hit_rate,results[m].f1],lineStyle:{color:colors[idx%colors.length]},itemStyle:{color:colors[idx%colors.length]},areaStyle:{opacity:0.1}}))}],color:colors});
+
+  // Overall rank
+  const c3 = initChart('r-chart-rank');
+  const overall = models.map(m=>({name:m,score:scoreOf(results[m])})).sort((a,b)=>a.score-b.score);
+  c3.setOption({...baseOpt(),
+    grid:{left:130,right:80,top:20,bottom:20},
+    xAxis:{type:'value',max:1,...warmAxis(),axisLabel:{formatter:v=>(v*100).toFixed(0)+'%',fontSize:10,color:'#b8a395'}},
+    yAxis:{type:'category',data:overall.map(o=>o.name),axisLabel:{fontSize:11,color:'#8a6e5c'}},
+    series:[{type:'bar',data:overall.map(o=>o.score),barWidth:'55%',itemStyle:{color:p=>{const r=p.dataIndex/(overall.length-1);return new echarts.graphic.LinearGradient(0,0,1,0,[{offset:0,color:'#f3ebe0'},{offset:1,color:r>0.5?'#7ba05b':'#d4763a'}])},borderRadius:[0,6,6,0]},label:{show:true,position:'right',formatter:p=>(p.value*100).toFixed(1)+'%',fontSize:11,fontWeight:600,color:'#5c3d2e'}}]
+  });
+}
+
+// ====== Page 4: Users (full implementation) ======
+async function loadUsers(){
+  const start = getVal('u-start'), end = getVal('u-end'), btype = getVal('u-btype');
+  const base = '?start='+start+'&end='+end;
+
+  // KPI —— 分域口径（事实二的两种数据来源用户空间互不相交，禁止跨源相加）
+  const usum = await fetch('/api/user_summary'+base).then(r=>r.json());
+  document.getElementById('u-val1').textContent = (usum.active_users||0).toLocaleString();
+  document.getElementById('u-val2').textContent = (usum.pv||0).toLocaleString();
+  document.getElementById('u-val3').textContent = (usum.fav_cnt||0).toLocaleString();
+  document.getElementById('u-val4').textContent = usum.browse_users>0?(usum.cart_users/usum.browse_users*100).toFixed(1)+'%':'--';
+  document.getElementById('u-val5').textContent = usum.browse_users>0?(usum.order_users/usum.browse_users*100).toFixed(1)+'%':'--';
+  document.getElementById('u-val6').textContent = usum.active_users>0?(usum.pv/usum.active_users).toFixed(1):'--';
+  // 活跃用户 QCD:明确主口径 + 并列展示另一域，避免读者把 73,146 当作真实活跃用户数
+  const uDom = document.getElementById('u-domain-note');
+  if(uDom){
+    uDom.innerHTML = '⚠️ <b>活跃用户口径</b>：行为域（淘宝 UserBehavior）' +
+      (usum.active_users||0).toLocaleString() + ' 人；' +
+      '评价域（Amazon 评价）' + (usum.review_users||0).toLocaleString() + ' 人。' +
+      '两域 <b>user_id 空间互不相交（交集 0）</b>，若直接跨源去重会得到 ' +
+      (usum.naive_distinct_users||0).toLocaleString() + ' 的拼接假值，故分域呈现。';
+  }
+  // 徽标：评价域用户数 = 平台会员口径（与看板总览"累计用户"同口径）
+  const ub = document.getElementById('u-user-badge');
+  if(ub) ub.textContent = '👥 评价域 ' + (usum.review_users||0).toLocaleString() + ' 人 · 行为域 ' + (usum.active_users||0).toLocaleString() + ' 人';
+
+  // ===== 热门关注商品 TOP20（闭合论文 §8.2 声称但此前无页面承载的口径，Q6） =====
+  try{
+    const hot = await fetch('/api/user_search_terms'+base).then(r=>r.json());
+    const hotRows = hot.rows || hot || [];
+    if(document.getElementById('u-chart-hot') && hotRows.length){
+      const top = hotRows.slice(0,20).slice().reverse();   // 横向条形图需反序呈现 TOP1 在顶
+      initChart('u-chart-hot').setOption({...baseOpt(),
+        tooltip:{trigger:'axis',axisPointer:{type:'shadow'},
+                 formatter:p=>{const it=top[p[0].dataIndex];
+                   return it.keyword+'<br/>'+hot.metric+'：'+it.search_cnt.toLocaleString()+
+                          ' 次<br/>去重买家：'+it.user_cnt.toLocaleString()+
+                          ' 人<br/>筛期销售额：¥'+it.revenue.toLocaleString();}},
+        grid:{left:190,right:80,top:10,bottom:20},
+        xAxis:{type:'value',...warmAxis(),axisLabel:{fontSize:9,color:'#b8a395'}},
+        yAxis:{type:'category',data:top.map(r=>r.keyword.length>22?r.keyword.slice(0,22)+'…':r.keyword),
+               axisLabel:{fontSize:10,color:'#8a6e5c'}},
+        series:[{type:'bar',data:top.map(r=>r.search_cnt),barWidth:'62%',
+                 itemStyle:{color:new echarts.graphic.LinearGradient(1,0,0,0,[{offset:0,color:'#c8534e'},{offset:1,color:'#e8a04a'}]),borderRadius:[0,4,4,0]},
+                 label:{show:true,position:'right',fontSize:9,color:'#8a6e5c'}}]
+      });
+      const note = document.getElementById('u-hot-note');
+      if(note) note.innerHTML = '⚠️ ' + (hot.note || '') +
+        '　热度口径：<b>' + (hot.metric||'购买次数') + '</b>　数据来源：' + (hot.source||'');
+    }
+  }catch(e){ console.warn('[TOP20] 加载失败', e); }
+
+  // Sankey: user path
+  const pathData = await fetch('/api/user_path_analysis'+base).then(r=>r.json());
+  const c1 = initChart('u-chart-sankey');
+  c1.setOption({...baseOpt(),
+    series:[{type:'sankey',layout:'none',emphasis:{focus:'adjacency'},
+      nodeWidth:24,nodeGap:16,layoutIterations:0,
+      data:pathData.nodes||[],
+      links:(pathData.links||[]).map(l=>({...l,lineStyle:{color:'gradient',curveness:0.5}})),
+      label:{fontSize:12,color:'#5c3d2e'},lineStyle:{color:'gradient',curveness:0.5}
+    }]
+  });
+
+  // Heatmap
+  const hmData = await fetch('/api/behavior_heatmap_detail'+base+'&type='+btype).then(r=>r.json());
+  const weekNames = ['周日','周一','周二','周三','周四','周五','周六'];
+  const hours = Array.from({length:24},(_,i)=>i+'时');
+  const hmMatrix = Array.from({length:7},()=>Array(24).fill(0));
+  hmData.forEach(d=>{ hmMatrix[d.weekday||0][d.hour||0] = d.cnt; });
+  const maxCnt = Math.max(...hmMatrix.flat(),1);
+  const c2 = initChart('u-chart-heatmap');
+  c2.setOption({...baseOpt(),
+    grid:{left:60,right:60,top:20,bottom:30},
+    xAxis:{type:'category',data:hours,...warmAxis(),axisLabel:{fontSize:9,color:'#b8a395'}},
+    yAxis:{type:'category',data:weekNames,...warmAxis(),axisLabel:{fontSize:11,color:'#b8a395'}},
+    visualMap:{min:0,max:maxCnt,calculable:true,orient:'horizontal',left:'center',bottom:0,inRange:{color:['#fdf8f1','#f5e0d0','#e89b5e','#d4763a','#b5612a']}},
+    series:[{type:'heatmap',data:hmMatrix.flatMap((row,y)=>row.map((v,x)=>[x,y,v])),label:{show:true,fontSize:9,color:'#8a6e5c'},emphasis:{itemStyle:{shadowBlur:10,shadowColor:'rgba(0,0,0,0.25)'}}}]
+  });
+
+  // Funnel
+  const funnel = await fetch('/api/conversion_funnel'+base).then(r=>r.json());
+  const c3 = initChart('u-chart-funnel');
+  c3.setOption({...baseOpt(),
+    series:[{type:'funnel',left:'10%',right:'10%',top:10,bottom:10,minSize:'25%',gap:2,
+      label:{show:true,position:'inside',fontSize:12,fontWeight:600,color:'#fff'},
+      data:funnel.stages.map((s,i)=>({name:s,value:funnel.counts[i],itemStyle:{color:colors[i%colors.length]}}))
+    }]
+  });
+
+  // Retention cohort
+  const retention = await fetch('/api/user_retention').then(r=>r.json());
+  const c4 = initChart('u-chart-retention');
+  const retentionSeries = retention.cohorts.map((co,idx)=>({
+    name:co.cohort,type:'line',smooth:true,
+    data:co.retention,lineStyle:{width:2,color:colors[idx%colors.length]},
+    itemStyle:{color:colors[idx%colors.length]},symbol:'circle',symbolSize:6
+  }));
+  c4.setOption({...baseOpt(),
+    legend:{data:retention.cohorts.map(c=>c.cohort),bottom:0,fontSize:9,textStyle:{color:'#8a6e5c'}},
+    grid:{left:60,right:30,top:20,bottom:50},
+    xAxis:{type:'category',data:Array.from({length:12},(_,i)=>'M'+i),name:'期数(月)',...warmAxis()},
+    yAxis:{type:'value',name:'留存率(%)',...warmAxis()},
+    series:retentionSeries
+  });
+
+  // Retention table
+  const tblDiv = document.getElementById('u-retention-table');
+  let tblHtml = '<table style="font-size:11px"><thead><tr><th>队列</th><th>新用户</th>';
+  for(let i=0;i<12;i++) tblHtml += '<th>M'+i+'</th>';
+  tblHtml += '</tr></thead><tbody>';
+  retention.cohorts.forEach(co=>{
+    tblHtml += '<tr><td style="font-weight:600">'+co.cohort+'</td><td>'+co.users+'</td>';
+    co.retention.forEach((r,i)=>{
+      const cls = i===0?'retention-high':r>30?'retention-high':r>15?'retention-mid':'retention-low';
+      tblHtml += '<td class="retention-cell '+cls+'">'+(r>0?r.toFixed(1)+'%':'-')+'</td>';
+    });
+    tblHtml += '</tr>';
+  });
+  tblHtml += '</tbody></table>';
+  tblDiv.innerHTML = tblHtml;
+
+  // RFM
+  const rfm = await fetch('/api/rfm_analysis').then(r=>r.json());
+  const c5 = initChart('u-chart-rfm');
+  c5.setOption({...baseOpt(),
+    grid:{left:80,right:40,top:20,bottom:30},
+    xAxis:{type:'category',data:rfm.map(r=>r.rfm_segment),...warmAxis(),axisLabel:{fontSize:10,color:'#8a6e5c',rotate:15}},
+    yAxis:{type:'value',name:'平均消费(元)',...warmAxis(),axisLabel:{formatter:v=>(v/10000).toFixed(0)+'万',fontSize:10,color:'#b8a395'}},
+    series:[{type:'bar',data:rfm.map(r=>r.avg_amount),barWidth:'45%',itemStyle:{color:p=>['#c8534e','#e8a04a','#d4763a','#a0688a','#b8a395'][p.dataIndex%5],borderRadius:[6,6,0,0]},label:{show:true,position:'top',formatter:p=>(p.value/10000).toFixed(1)+'万',fontSize:9,color:'#8a6e5c'}}]
+  });
+
+  // Pet type
+  const seg = await fetch('/api/user_segments').then(r=>r.json());
+  const c6 = initChart('u-chart-pet');
+  c6.setOption({...baseOpt(),
+    legend:{bottom:0,fontSize:10,textStyle:{color:'#8a6e5c'}},
+    grid:{left:60,right:30,top:20,bottom:40},
+    xAxis:{type:'category',data:seg.pet_type.map(p=>p.pet_type),...warmAxis()},
+    yAxis:{type:'value',name:'人数',...warmAxis()},
+    series:[
+      {name:'总用户',type:'bar',data:seg.pet_type.map(p=>p.cnt),itemStyle:{color:'#d4763a',borderRadius:[4,4,0,0]},barWidth:'30%'},
+      {name:'复购用户',type:'bar',data:seg.pet_type.map(p=>p.repurchase),itemStyle:{color:'#7ba05b',borderRadius:[4,4,0,0]},barWidth:'30%'}
+    ]
+  });
+
+  // City 图已下线（真实数据源无地域字段，city_tier 为常量），容器由"维度可用性说明"替代
+
+  // Activity
+  initChart('u-chart-activity').setOption({...baseOpt(),series:[{type:'pie',radius:'60%',label:{fontSize:10,color:'#8a6e5c'},data:seg.activity.map(a=>({name:a.activity_level,value:a.cnt}))}],color:['#7ba05b','#e8a04a','#b8a395']});
+
+  // Consume
+  initChart('u-chart-consume').setOption({...baseOpt(),
+    grid:{left:60,right:30,top:20,bottom:30},
+    xAxis:{type:'category',data:seg.consume_level.map(c=>c.consume_level),...warmAxis(),axisLabel:{fontSize:9,color:'#b8a395'}},
+    yAxis:{type:'value',...warmAxis()},
+    series:[{type:'bar',data:seg.consume_level.map(c=>c.cnt),barWidth:'50%',itemStyle:{color:new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'#e8a04a'},{offset:1,color:'#d4763a'}]),borderRadius:[4,4,0,0]},label:{show:true,position:'top',fontSize:9,color:'#8a6e5c'}}]
+  });
+
+  await renderUserLifecycle();
+}
+
+// ====== 宠物生命阶段画像（派生推断 · C2 双维画像补救） ======
+async function renderUserLifecycle(){
+  try{
+    const lc = await fetch('/api/pet_lifecycle?view=summary').then(r=>r.json());
+    if(!lc || lc.error){
+      document.getElementById('u-lc-note').innerHTML = '<span style="color:#c0392b">⚠ '+(lc&&lc.error||'未获取到生命周期推断结果')+'</span>';
+      return;
+    }
+    const ds = lc.data_stats||{}, sw = lc.switch_stats||{};
+    const hint = document.getElementById('u-lc-hint');
+    if(hint) hint.textContent = '证据覆盖 '+((ds.evidence_coverage||0)*100).toFixed(1)+'% · '+ds.users_with_evidence+'/'+(ds.total_users||0)+' 用户';
+
+    // 阶段分布饼图
+    const dist = lc.user_stage_distribution||{};
+    initChart('u-chart-lifecycle').setOption({...baseOpt(),
+      title:{text:'推断生命阶段分布（有证据用户）', left:'center', top:0, textStyle:{fontSize:12, color:'#8A6A50'}},
+      tooltip:{trigger:'item', formatter:'{b}: {c} ({d}%)'},
+      series:[{type:'pie', radius:['38%','62%'], center:['50%','58%'],
+        label:{fontSize:10, color:'#8a6e5c'},
+        data:Object.keys(dist).map(k=>({name:k, value:dist[k]}))}],
+      color:['#7ba05b','#e8a04a','#d4763a','#b8a395']
+    });
+
+    // 切换状态分布（键名与 switch_stats 字段一一对应）
+    const swMap = {
+      'confirmed':'已确认切换','ongoing':'过渡中','same_day_mixed':'同日混合购买',
+      'short_interval_undetermined':'短间隔不可判定','reverse_order_undetermined':'逆序(未判定)',
+      'young_only_no_switch_observed':'仅幼年粮','adult_only_no_baseline':'仅成年粮'
+    };
+    const swKeys = {
+      'confirmed':'confirmed_switch_users','ongoing':'ongoing_switch_users',
+      'same_day_mixed':'same_day_mixed_users','short_interval_undetermined':'short_interval_users',
+      'reverse_order_undetermined':'reverse_order_users',
+      'young_only_no_switch_observed':'young_only_users','adult_only_no_baseline':'adult_only_users'
+    };
+    const swData = Object.keys(swMap).map(k=>({name:swMap[k], value:sw[swKeys[k]]||0})).filter(d=>d.value>0);
+    initChart('u-chart-lcswitch').setOption({...baseOpt(),
+      title:{text:'幼年→成年 粮型迁移状态', left:'center', top:0, textStyle:{fontSize:12, color:'#8A6A50'}},
+      grid:{left:110, right:36, top:44, bottom:24},
+      tooltip:{trigger:'axis'},
+      xAxis:{type:'value', ...warmAxis(), axisLabel:{fontSize:9, color:'#b8a395'}},
+      yAxis:{type:'category', data:swData.map(d=>d.name), axisLabel:{fontSize:9, color:'#8a6e5c'}},
+      series:[{type:'bar', data:swData.map(d=>d.value), barWidth:'52%',
+        itemStyle:{color:'#7ba05b', borderRadius:[0,4,4,0]},
+        label:{show:true, position:'right', fontSize:9, color:'#8a6e5c'}}]
+    });
+
+    // 关键指标条
+    const chips = [
+      ['有证据用户', (ds.users_with_evidence||0).toLocaleString()],
+      ['未标注(未知)', (ds.users_without_evidence||0).toLocaleString()],
+      ['已确认切换', sw.confirmed_switch_users+' 人'],
+      ['迁移中位间隔', (sw.gap_median!=null? sw.gap_median+' 天' : '--')],
+      ['P25–P75', (sw.gap_p25!=null? sw.gap_p25+'–'+sw.gap_p75+' 天' : '--')],
+      ['观测窗口', sw.observation_window || '--']
+    ];
+    document.getElementById('u-lc-stats').innerHTML = chips.map(c=>
+      '<div class="lc-chip"><div class="k">'+c[0]+'</div><div class="v">'+c[1]+'</div></div>').join('');
+
+    // 宠物维度画像表
+    const prof = lc.pet_profiles||[];
+    let html = '<table class="data-table"><thead><tr><th>推断阶段</th><th>宠物类型</th><th>用户数</th><th>人均订单</th><th>人均消费</th><th>置信度分布</th><th>TOP 类目偏好</th></tr></thead><tbody>';
+    prof.slice(0,10).forEach(p=>{
+      const cf = Object.entries(p.confidence_dist||{}).map(([k,v])=>k+':'+v).join(' / ');
+      html += '<tr><td><b>'+p.inferred_stage+'</b></td><td>'+p.pet_type+'</td><td>'+p.user_count.toLocaleString()+'</td><td>'+p.avg_orders+'</td><td>¥'+p.avg_lifetime_amount+'</td><td>'+cf+'</td><td>'+(p.top_sub_categories||[]).slice(0,3).map(c=>c.sub_category).join('、')+'</td></tr>';
+    });
+    html += '</tbody></table>';
+    document.getElementById('u-lc-profile').innerHTML = html;
+
+    // 铁律声明（可追溯 + 未知显式标注）
+    const lim = (lc.limitations||[]).slice(0,4).map(t=>'<li>'+t+'</li>').join('');
+    document.getElementById('u-lc-note').innerHTML =
+      '<b>⚠ 数据来源与口径声明：</b>「推断阶段」为派生字段，证据 = 商品标题/描述中 puppy/kitten/adult/senior 等关键词的正则命中（仅消耗品类目），'+
+      '逐条可回溯至 ads_pet_lifecycle.evidence；无证据用户统一标注为「未标注(未知)」，不做填充或臆测。'+
+      '<ul style="margin:6px 0 0 18px;color:#8a6e5c;font-size:11px;line-height:1.7">'+lim+'</ul>';
+  }catch(e){
+    const n=document.getElementById('u-lc-note');
+    if(n) n.innerHTML='<span style="color:#c0392b">⚠ 生命周期画像加载失败：'+e.message+'</span>';
+  }
+}
+
+// ====== Page 5: 宠物热销榜（黏土风） ======
+const PET_CAT_IMG = {'狗用品':'/static/img/cat_dog.png','猫用品':'/static/img/cat_cat.png','水族用品':'/static/img/cat_fish.png','鸟类用品':'/static/img/cat_bird.png','小宠用品':'/static/img/cat_small.png','通用用品':'/static/img/cat_general.png'};
+const PET_CAT_COLOR = {'狗用品':'#F5A65B','猫用品':'#F2B84B','水族用品':'#7FB069','鸟类用品':'#6BA89A','小宠用品':'#E8894A','通用用品':'#D4A045'};
+const PET_CAT_ICON = {'狗用品':'🐶','猫用品':'🐱','水族用品':'🐟','鸟类用品':'🐦','小宠用品':'🐹','通用用品':'🛒'};
+const PET_CATS = ['狗用品','猫用品','水族用品','鸟类用品','小宠用品','通用用品'];
+let petsActiveCat = '';
+let petsShareLast = [];
+let petsCurrent = [];
+let petsCompare = [];
+
+function petsCatImg(c){ return PET_CAT_IMG[c] || PET_CAT_IMG['通用用品']; }
+// 商品图**四级回退**：本地静态图 → 外网原图 → 类目占位图 → 内联 SVG 兜底。
+// - 本地图由 etl/download_product_images.py 预抓 TOP1000 热门商品到
+//   /static/img/products/{product_id}.jpg，答辩/云上部署时不再依赖外网可达性（Q1）；
+// - 外网原图为次选（本地未覆盖的长尾商品）；
+// - 仍未落到图像的 14.6% 商品（源数据本身无图）回落到类目插画，不出现空白卡片。
+var PET_FALLBACK_SVG = 'data:image/svg+xml;utf8,' + encodeURIComponent(
+  '<svg xmlns="http://www.w3.org/2000/svg" width="200" height="140"><rect width="200" height="140" fill="#FFEEDC"/>' +
+  '<text x="100" y="78" font-size="46" text-anchor="middle">🐾</text></svg>');
+function petsImg(p){
+  if(!p) return petsCatImg();
+  if(!p.image_url) return petsCatImg(p.main_category);          // 源数据无图，直接给类目插画
+  if(!p.product_id) return p.image_url;
+  return '/static/img/products/' + p.product_id + '.jpg';        // 本地优先
+}
+// 生成 img 标签：把外网地址备在 data-remote 上，供第二级回退使用
+function petsImgTag(p, extraAttrs){
+  const remote = (p && p.image_url) ? String(p.image_url).replace(/"/g, '&quot;') : '';
+  return '<img src="' + petsImg(p) + '" data-remote="' + remote + '" data-imgstage="0" ' +
+         'alt="' + ((p && p.product_name) || '') + '" ' + (extraAttrs || '') +
+         'onerror="petsImgFallback(this,\'' + ((p && p.main_category) || '') + '\')">';
+}
+function petsImgFallback(el, cat){
+  var stage = parseInt(el.getAttribute('data-imgstage') || '0', 10) + 1;
+  el.setAttribute('data-imgstage', String(stage));
+  if(stage === 1){                                   // 本地图缺失 → 试外网原图
+    var remote = el.getAttribute('data-remote');
+    if(remote){ el.src = remote; return; }
+    stage = 2; el.setAttribute('data-imgstage', '2');
+  }
+  if(stage === 2){ el.onerror = null; el.src = petsCatImg(cat); return; }  // → 类目插画
+  el.onerror = null; el.src = PET_FALLBACK_SVG;                            // → 内联 SVG
+}
+function petsStars(r){ const f = Math.round(r||0); return '★'.repeat(Math.max(0,Math.min(5,f))) + '☆'.repeat(Math.max(0,5-Math.max(0,Math.min(5,f)))); }
+function fmtMoney(v){ v = v||0; if(v>=1e8) return '¥'+(v/1e8).toFixed(2)+' 亿'; if(v>=1e4) return '¥'+(v/1e4).toFixed(1)+' 万'; return '¥'+Math.round(v).toLocaleString(); }
+
+function petsInitChips(){
+  let html = '<button class="pets-chip active" data-cat="" onclick="petsSetCat(this)">全部品类</button>';
+  PET_CATS.forEach(c=>{ html += '<button class="pets-chip" data-cat="'+c+'" onclick="petsSetCat(this)">'+PET_CAT_ICON[c]+' '+c+'</button>'; });
+  document.getElementById('pets-cat-chips').innerHTML = html;
+}
+function petsSetCat(el){
+  petsActiveCat = el.getAttribute('data-cat') || '';
+  document.querySelectorAll('#pets-cat-chips .pets-chip').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  loadPets();
+}
+
+async function loadPets(){
+  const start = getVal('pets-start'), end = getVal('pets-end');
+  const cat = petsActiveCat;
+  const sort = document.getElementById('pets-sort').value;
+  const limit = document.getElementById('pets-limit').value;
+  try{
+    const [top, share, summary] = await Promise.all([
+      fetch('/api/pet_top?start='+start+'&end='+end+'&category='+cat+'&sort='+sort+'&limit='+limit).then(r=>r.json()),
+      fetch('/api/pet_category_share?start='+start+'&end='+end).then(r=>r.json()),
+      fetch('/api/product_summary?start='+start+'&end='+end+'&category='+cat).then(r=>r.json())
+    ]);
+    petsCurrent = top || [];
+    renderPetsKpis(share || [], summary || {});
+    renderPetsCards();
+    renderPetsShare(share || [], cat);
+    renderPetsCompare();
+  }catch(e){ showToast('热销榜数据加载失败', 'error'); }
+}
+
+function renderPetsKpis(share, summary){
+  const rows = petsActiveCat ? share.filter(s=>s.main_category===petsActiveCat) : share;
+  const products = rows.reduce((s,c)=>s+(c.product_count||0),0);
+  const sales = rows.reduce((s,c)=>s+(c.sales_quantity||0),0);
+  const rev = rows.reduce((s,c)=>s+(c.revenue||0),0);
+  document.getElementById('pets-kpis').innerHTML =
+    '<div class="pets-kpi"><div class="pets-kpi-label">🏷 动销商品数</div><div class="pets-kpi-value">'+products.toLocaleString()+'</div><div class="pets-kpi-sub">'+(petsActiveCat||'全部品类')+' · 有成交记录</div></div>'+
+    '<div class="pets-kpi"><div class="pets-kpi-label">📦 累计销量</div><div class="pets-kpi-value">'+sales.toLocaleString()+'</div><div class="pets-kpi-sub">件 · 订单明细汇总</div></div>'+
+    '<div class="pets-kpi"><div class="pets-kpi-label">💰 累计销售额</div><div class="pets-kpi-value">'+fmtMoney(rev)+'</div><div class="pets-kpi-sub">已完成订单口径</div></div>'+
+    '<div class="pets-kpi"><div class="pets-kpi-label">⭐ 平均评分</div><div class="pets-kpi-value">'+(summary.avg_rating||0).toFixed(1)+'</div><div class="pets-kpi-sub">动销商品平均评分</div></div>';
+}
+
+function renderPetsCards(){
+  const box = document.getElementById('pets-cards');
+  const q = (document.getElementById('pets-search-input').value || '').trim().toLowerCase();
+  const list = petsCurrent.filter(p => !q || (p.product_name||'').toLowerCase().includes(q) || (p.brand||'').toLowerCase().includes(q));
+  if(!list.length){ box.innerHTML = '<div class="pets-compare-empty" style="grid-column:1/-1">🔍 当前筛选 / 搜索条件下暂无商品</div>'; return; }
+  box.innerHTML = list.map(p=>{
+    const i = petsCurrent.indexOf(p);
+    const inCmp = petsCompare.some(c=>c.product_id===p.product_id);
+    return '<div class="pets-card">'+
+      '<div class="pets-card-img">' + petsImgTag(p, 'loading="lazy"') +
+      (i===0?'<div class="pets-badge-best">✨ BEST SELLER</div>':'')+
+      '<div class="pets-rank">TOP '+(i+1)+'</div></div>'+
+      '<div class="pets-card-body">'+
+      '<div class="pets-card-name" title="'+p.product_name+'">'+p.product_name+'</div>'+
+      '<div class="pets-card-tags"><span class="pets-tag pet" style="background:'+(PET_CAT_COLOR[p.main_category]||'#D4A045')+'">'+(PET_CAT_ICON[p.main_category]||'🐾')+' '+p.main_category+'</span><span class="pets-tag">'+(p.brand||'未知品牌')+'</span></div>'+
+      '<div class="pets-card-rating"><span class="stars">'+petsStars(p.avg_rating)+'</span> '+(p.avg_rating||0).toFixed(1)+' · '+(p.review_count||0).toLocaleString()+' 条评价</div>'+
+      '<div class="pets-card-row"><span class="pets-price">¥'+(p.price||0).toFixed(0)+'</span><span class="pets-sales">已售 '+(p.sales_quantity||0).toLocaleString()+' 件</span></div>'+
+      '<div class="pets-card-actions">'+
+      '<button class="pets-btn pets-btn-detail" onclick="openPetsModal('+i+')">查看详情</button>'+
+      '<button class="pets-btn pets-btn-compare'+(inCmp?' in':'')+'" data-pid="'+p.product_id+'" onclick="toggleCompare(this)">'+(inCmp?'已加入 ✓':'加入对比')+'</button>'+
+      '</div></div></div>';
+  }).join('');
+}
+function petsFilterCards(){ renderPetsCards(); }
+
+function renderPetsShare(share, activeCat){
+  petsShareLast = share;
+  const total = share.reduce((s,c)=>s+(c.revenue||0),0) || 1;
+  const c = initChart('pets-share');
+  if(c) c.setOption(Object.assign({}, baseOpt(), {
+    tooltip:{trigger:'item', formatter:function(p){ return p.name+'<br>销售额 '+fmtMoney(p.value)+'（'+p.percent+'%）'; }},
+    series:[{type:'pie', radius:['46%','72%'], center:['50%','46%'],
+      itemStyle:{borderRadius:10, borderColor:'#FFF9F2', borderWidth:3},
+      label:{show:true, position:'outside', formatter:'{b}\n{d}%', fontSize:10.5, color:'#8A6A50'},
+      emphasis:{scale:true, scaleSize:6},
+      data: share.map(s=>({name:s.main_category, value:s.revenue,
+        itemStyle:{color: PET_CAT_COLOR[s.main_category]||'#D4A045', opacity: (activeCat && s.main_category!==activeCat) ? 0.28 : 1}}))
+    }]
+  }));
+  document.getElementById('pets-share-legend').innerHTML = share.map(s=>
+    '<div class="pets-lg-item"><span class="pets-lg-dot" style="background:'+(PET_CAT_COLOR[s.main_category]||'#D4A045')+'"></span>'+s.main_category+' '+(s.revenue/total*100).toFixed(1)+'%</div>').join('');
+}
+
+function toggleCompare(el){
+  const pid = el.getAttribute('data-pid');
+  const idx = petsCompare.findIndex(c=>c.product_id===pid);
+  if(idx>=0){ petsCompare.splice(idx,1); }
+  else{
+    if(petsCompare.length>=8){ showToast('对比清单最多 8 件，请先移除部分商品', 'error'); return; }
+    const p = petsCurrent.find(c=>c.product_id===pid);
+    if(p) petsCompare.push(p);
+  }
+  renderPetsCards(); renderPetsCompare();
+}
+function petsClearCompare(){ petsCompare = []; renderPetsCards(); renderPetsCompare(); }
+function renderPetsCompare(){
+  const body = document.getElementById('pets-compare-body');
+  const foot = document.getElementById('pets-compare-foot');
+  if(!petsCompare.length){
+    body.innerHTML = '<div class="pets-compare-empty">🧺 对比清单还是空的<br>点击商品卡片的「加入对比」<br>即可在此横向比较多件商品</div>';
+    foot.innerHTML = '';
+    return;
+  }
+  body.innerHTML = petsCompare.map(p=>
+    '<div class="pets-cmp-item">' + petsImgTag(p) +
+    '<div style="flex:1;min-width:0"><div class="pets-cmp-name" title="'+p.product_name+'">'+p.product_name+'</div>'+
+    '<div class="pets-cmp-sales">¥'+(p.price||0).toFixed(0)+' · 已售 '+(p.sales_quantity||0).toLocaleString()+' 件</div></div>'+
+    '<button class="pets-cmp-remove" data-pid="'+p.product_id+'" onclick="toggleCompare(this)">✕</button></div>').join('');
+  const n = petsCompare.length;
+  const sales = petsCompare.reduce((s,p)=>s+(p.sales_quantity||0),0);
+  const rev = petsCompare.reduce((s,p)=>s+(p.revenue||0),0);
+  const rating = petsCompare.reduce((s,p)=>s+(p.avg_rating||0),0)/n;
+  foot.innerHTML =
+    '<div class="pets-cmp-stats">'+
+    '<div class="pets-cmp-stat"><div class="k">已选商品</div><div class="v">'+n+' 件</div></div>'+
+    '<div class="pets-cmp-stat"><div class="k">合计销量</div><div class="v">'+sales.toLocaleString()+'</div></div>'+
+    '<div class="pets-cmp-stat"><div class="k">合计销售额</div><div class="v">'+fmtMoney(rev)+'</div></div>'+
+    '<div class="pets-cmp-stat"><div class="k">平均评分</div><div class="v">'+rating.toFixed(2)+'</div></div></div>'+
+    '<div class="pets-cmp-btns"><button class="pets-cmp-btn pets-cmp-clear" onclick="petsClearCompare()">清空</button>'+
+    '<button class="pets-cmp-btn pets-cmp-export" onclick="petsExportCompare()">导出 CSV</button></div>';
+}
+function petsExportCompare(){
+  if(!petsCompare.length){ showToast('对比清单为空', 'error'); return; }
+  const rows = petsCompare.map(p=>({商品:p.product_name, 品类:p.main_category, 子类:p.sub_category, 品牌:p.brand, 价格:p.price, 销量:p.sales_quantity, 销售额:p.revenue, 评分:p.avg_rating, 购买用户数:p.buyer_count}));
+  const csv = '\ufeff' + Object.keys(rows[0]).join(',') + '\n' +
+    rows.map(r=>Object.values(r).map(v=>'"'+String(v==null?'':v).replace(/"/g,'""')+'"').join(',')).join('\n');
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = '宠物热销榜对比清单_' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click(); URL.revokeObjectURL(a.href);
+  showToast('导出成功 ('+rows.length+' 件)');
+}
+
+async function openPetsModal(i){
+  const p = petsCurrent[i];
+  if(!p) return;
+  const pmImg = document.getElementById('pm-img');
+  pmImg.setAttribute('data-remote', p.image_url || '');
+  pmImg.setAttribute('data-imgstage', '0');
+  pmImg.onerror = function(){ petsImgFallback(pmImg, p.main_category); };
+  pmImg.src = petsImg(p);
+  const catEl = document.getElementById('pm-cat');
+  catEl.textContent = (PET_CAT_ICON[p.main_category]||'🐾') + ' ' + p.main_category + ' · ' + (p.sub_category||'');
+  catEl.style.background = PET_CAT_COLOR[p.main_category] || '#D4A045';
+  document.getElementById('pm-name').textContent = p.product_name;
+  document.getElementById('pm-meta').innerHTML = '品牌：'+(p.brand||'未知')+' ｜ 单价：<b style="color:#E8894A">¥'+(p.price||0).toFixed(0)+'</b> ｜ 评分：<span class="stars" style="color:#F2B84B">'+petsStars(p.avg_rating)+'</span> '+(p.avg_rating||0).toFixed(1)+'（'+(p.review_count||0).toLocaleString()+' 条评价）';
+  const share = petsShareLast.find(s=>s.main_category===p.main_category);
+  const catRev = share ? share.revenue : 0;
+  const inCat = catRev>0 ? (p.revenue/catRev*100).toFixed(1)+'%' : '--';
+  document.getElementById('pm-stats').innerHTML =
+    '<div class="pm-stat"><div class="k">累计销量</div><div class="v">'+(p.sales_quantity||0).toLocaleString()+'</div></div>'+
+    '<div class="pm-stat"><div class="k">累计销售额</div><div class="v">'+fmtMoney(p.revenue)+'</div></div>'+
+    '<div class="pm-stat"><div class="k">购买用户数</div><div class="v">'+(p.buyer_count||0).toLocaleString()+'</div></div>'+
+    '<div class="pm-stat"><div class="k">品类内销售额占比</div><div class="v">'+inCat+'</div></div>'+
+    '<div class="pm-stat"><div class="k">榜单排名</div><div class="v">TOP '+(i+1)+'</div></div>'+
+    '<div class="pm-stat"><div class="k">件均金额</div><div class="v">¥'+(p.sales_quantity>0 ? (p.revenue/p.sales_quantity).toFixed(0) : 0)+'</div></div>';
+  document.getElementById('pets-modal-mask').classList.add('show');
+  const start = getVal('pets-start'), end = getVal('pets-end');
+  const trend = await fetch('/api/pet_product_trend?product_id='+encodeURIComponent(p.product_id)+'&start='+start+'&end='+end).then(r=>r.json());
+  const c = initChart('pets-trend');
+  if(c) c.setOption(Object.assign({}, baseOpt(), {
+    title:{text:'按日销售趋势', left:'center', top:0, textStyle:{fontSize:13, color:'#8A6A50'}},
+    grid:{left:58, right:26, top:46, bottom:34},
+    tooltip:{trigger:'axis'},
+    xAxis:{type:'category', data:trend.map(t=>t.date_str.slice(5)), axisLabel:{fontSize:10, color:'#B8A395'}},
+    yAxis:[{type:'value', name:'销量(件)', axisLabel:{fontSize:10, color:'#B8A395'}, splitLine:{lineStyle:{color:'#F0E4D4'}}},
+           {type:'value', name:'销售额(元)', axisLabel:{fontSize:10, color:'#B8A395'}, splitLine:{show:false}}],
+    series:[
+      {name:'销量', type:'bar', data:trend.map(t=>t.qty), itemStyle:{color:'#F5A65B', borderRadius:[4,4,0,0]}, barMaxWidth:16},
+      {name:'销售额', type:'line', yAxisIndex:1, data:trend.map(t=>t.revenue), itemStyle:{color:'#7FB069'}, lineStyle:{width:2}, symbol:'none', smooth:true}
+    ]
+  }));
+}
+function closePetsModal(){ document.getElementById('pets-modal-mask').classList.remove('show'); }
+
+// ============================================================
+// 时序购物篮洞察页（v2）
+// ============================================================
+async function loadBasket(){
+  const minUsers = getVal('b-min-users') || '30';
+  const topN = getVal('b-topn') || '40';
+  try{
+    const [rules, graph, cycles] = await Promise.all([
+      fetch('/api/temporal_rules?min_users='+minUsers+'&limit=200').then(r=>r.json()),
+      fetch('/api/temporal_rules?view=graph&min_users='+minUsers+'&top_n='+topN).then(r=>r.json()),
+      fetch('/api/repurchase_cycle').then(r=>r.json())
+    ]);
+    if(!Array.isArray(rules) || !rules.length){
+      document.getElementById('b-badge').textContent='⚠️ 无时序规则数据';
+      showToast('未获取到时序规则，请先运行 analytics/temporal_basket.py', 'error');
+      return;
+    }
+    const gaps = rules.map(r=>r.gap_median).filter(v=>v>0);
+    const avgGap = gaps.length ? (gaps.reduce((a,b)=>a+b,0)/gaps.length) : 0;
+    document.getElementById('b-k1').textContent = rules.length;
+    document.getElementById('b-k1-sub').textContent = '≥'+minUsers+' 用户共现';
+    document.getElementById('b-k2').textContent = avgGap ? avgGap.toFixed(1)+' 天' : '--';
+    document.getElementById('b-k2-sub').textContent = '窗口上限 120 天';
+    document.getElementById('b-k3').textContent = Array.isArray(cycles) ? cycles.length : 0;
+    document.getElementById('b-k3-sub').textContent = '二级类目消耗周期画像';
+    const lead = cycles && cycles.length ? cycles[0].sub_category : '--';
+    document.getElementById('b-k5').textContent = lead;
+    document.getElementById('b-k5-sub').textContent = cycles && cycles.length ? ('周期 '+cycles[0].cycle_median+' 天') : '';
+    document.getElementById('b-k6').textContent = '120 天';
+    document.getElementById('b-k6-sub').textContent = '跨订单时序窗口';
+    document.getElementById('b-badge').textContent = '🔗 '+rules.length+' 条时序规则';
+
+    renderBasketGraph(graph);
+    renderBasketCycle(cycles||[]);
+    renderBasketRules(rules);
+    const catSel = document.getElementById('b-cand-cat');
+    if(catSel && catSel.options.length <= 1){
+      (cycles||[]).forEach(c=>{
+        const o=document.createElement('option'); o.value=c.sub_category; o.textContent=c.sub_category; catSel.appendChild(o);
+      });
+    }
+    loadBasketCands();
+  }catch(e){
+    console.error('[Basket] 加载失败:', e);
+    showToast('购物篮洞察数据加载失败: '+e.message, 'error');
+  }
+}
+
+function renderBasketGraph(graph){
+  const c = initChart('b-chart-graph');
+  if(!c) return;
+  const nodes = (graph.nodes||[]).map((n,i)=>({
+    name:n.name, symbolSize:34,
+    itemStyle:{color:colors[i%colors.length]},
+    label:{color:'#5c3d2e', fontSize:12, fontWeight:600}
+  }));
+  const maxConf = Math.max(...(graph.links||[]).map(l=>l.value||0), 0.0001);
+  const links = (graph.links||[]).map(l=>({
+    source:l.source, target:l.target, value:l.value,
+    lineStyle:{width:1+(l.value/maxConf)*5, opacity:0.55, curveness:0.18},
+    label:{show:false}
+  }));
+  c.setOption(Object.assign(baseOpt(), {
+    tooltip:Object.assign({}, baseOpt().tooltip, {formatter: p=>{
+      if(p.dataType==='edge'){
+        const d=p.data; return d.source+' → '+d.target+'<br/>置信度 '+d.value+'<br/>共现用户 '+ (p.data.users||'');
+      }
+      return p.data.name;
+    }}),
+    series:[{
+      type:'graph', layout:'force', roam:true, draggable:true,
+      data:nodes, links:links, categories:undefined,
+      force:{repulsion:520, edgeLength:[90,160], gravity:0.12},
+      label:{show:true, position:'right'},
+      emphasis:{focus:'adjacency', lineStyle:{opacity:0.9}},
+      lineStyle:{color:'source', curveness:0.18}
+    }]
+  }));
+}
+
+function renderBasketCycle(cycles){
+  const c = initChart('b-chart-cycle');
+  if(!c) return;
+  const data = cycles.slice(0, 12);
+  const cats = data.map(d=>d.sub_category);
+  c.setOption(Object.assign(baseOpt(), {
+    legend:{data:['周期中位数','P25','P75'], textStyle:{color:'#8a6a50'}, top:0},
+    grid:{left:44, right:16, top:38, bottom:56},
+    xAxis:Object.assign(warmAxis(), {type:'category', data:cats, axisLabel:{color:'#8a6a50', fontSize:11, rotate:32}}),
+    yAxis:Object.assign(warmAxis(), {type:'value', name:'天', nameTextStyle:{color:'#b8a395'}}),
+    series:[
+      {name:'周期中位数', type:'bar', data:data.map(d=>d.cycle_median), itemStyle:{color:'#d4763a', borderRadius:[6,6,0,0]}},
+      {name:'P25', type:'line', data:data.map(d=>d.cycle_p25), smooth:true, lineStyle:{color:'#7ba05b', width:2}, itemStyle:{color:'#7ba05b'}},
+      {name:'P75', type:'line', data:data.map(d=>d.cycle_p75), smooth:true, lineStyle:{color:'#c8534e', width:2}, itemStyle:{color:'#c8534e'}}
+    ]
+  }));
+}
+
+function renderBasketRules(rules){
+  const tb = document.querySelector('#tbl-basket-rules tbody');
+  if(!tb) return;
+  tb.innerHTML = rules.slice(0,25).map((r,i)=>{
+    return '<tr><td>'+(i+1)+'</td><td>'+r.antecedent+'</td><td>'+r.consequent+'</td>'+
+      '<td style="text-align:right">'+r.users_ab+'</td>'+
+      '<td style="text-align:right">'+(r.confidence*100).toFixed(1)+'%</td>'+
+      '<td style="text-align:right">'+r.lift.toFixed(2)+'</td>'+
+      '<td style="text-align:right">'+r.gap_median+'</td></tr>';
+  }).join('');
+}
+
+async function loadBasketCands(){
+  const cat = getVal('b-cand-cat') || '';
+  try{
+    const rows = await fetch('/api/replenishment_candidates?limit=100&flat=1'+(cat? '&category='+encodeURIComponent(cat):'')).then(r=>r.json());
+    if(!Array.isArray(rows)) return;
+    document.getElementById('b-k4').textContent = rows.length;
+    document.getElementById('b-k4-sub').textContent = cat ? (cat + ' · 按累计消费 TOP100') : '按累计消费 TOP300 输出';
+    const tb = document.querySelector('#tbl-basket-cands tbody');
+    if(!tb) return;
+    tb.innerHTML = rows.slice(0,50).map((r,i)=>{
+      const sp = [r.suggested_product_1, r.suggested_product_2, r.suggested_product_3].filter(Boolean).join(' / ');
+      return '<tr><td>'+(i+1)+'</td><td>'+String(r.user_id).slice(0,12)+'</td><td>'+(r.rfm_segment||'')+'</td>'+
+        '<td>'+(r.sub_category||'')+'</td><td>'+(r.last_purchase_date||'')+'</td>'+
+        '<td style="text-align:right">'+r.cycle_median+'</td>'+
+        '<td style="text-align:right">'+r.days_elapsed+'</td>'+
+        '<td style="text-align:right">'+(r.cycle_ratio||'').toString()+'</td>'+
+        '<td style="font-size:11.5px">'+sp+'</td>'+
+        '<td style="text-align:right">¥'+Number(r.lifetime_amount||0).toFixed(0)+'</td></tr>';
+    }).join('') || '<tr><td colspan="10" style="text-align:center;color:#b8a395">暂无候选数据</td></tr>';
+  }catch(e){ console.error('[Basket] 补货候选加载失败:', e); }
+}
+
+function exportBasket(kind){
+  const minUsers = getVal('b-min-users') || '30';
+  if(kind === 'rules'){
+    exportData('temporal_rules', {min_users:minUsers, limit:200}, '时序关联规则');
+  } else {
+    const cat = getVal('b-cand-cat');
+    exportData('replenishment_candidates', {limit:300, flat:1, category:cat}, '补货候选清单');
+  }
+}
+
+// ====== Page 7: A/B 模拟实验 ======
+let abStrategies = [];
+const AB_PARAM_COLORS = ['#e8a04a','#7ba05b','#6BA89A','#d4763a','#b8a395','#F2B84B'];
+
+async function initABPage(){
+  if(abStrategies.length) return;   // 只初始化一次
+  try{
+    const p = await fetch('/api/ab_presets').then(r=>r.json());
+    if(p.error){ showToast(p.error,'error'); return; }
+    abStrategies = (p.preset_strategies||[]).map(s=>({...s}));
+    renderABStrategies(p.param_schema||[]);
+    if(p.last_run){
+      document.getElementById('ab-last').textContent =
+        '上次运行: '+p.last_run.generated_at+' (seed '+p.last_run.seed+', '+p.last_run.n_users+' 用户)';
+    }
+    // 有历史结果则直接回显
+    fetch('/api/ab_presets').then(r=>r.json()).then(pp=>{
+      if(pp.last_run) renderABFromCache();
+    });
+  }catch(e){ showToast('A/B 配置加载失败: '+e.message,'error'); }
+}
+
+function renderABStrategies(schema){
+  const box = document.getElementById('ab-strategies');
+  box.innerHTML = abStrategies.map((s,si)=>{
+    const sliders = schema.filter(f=>['w_pop','w_affinity','w_co','epsilon'].includes(f.key)).map(f=>{
+      const v = s.params[f.key]!=null? s.params[f.key] : f.default;
+      return '<div style="display:flex;align-items:center;gap:8px;margin:6px 0">'+
+        '<span style="font-size:11px;color:var(--text-3);width:96px">'+f.label+'</span>'+
+        '<input type="range" min="'+f.min+'" max="'+f.max+'" step="'+f.step+'" value="'+v+'" '+
+        'style="flex:1" oninput="this.nextElementSibling.textContent=(+this.value).toFixed(2);updateABParam('+si+',\''+f.key+'\',+this.value)">'+
+        '<b style="font-size:11px;width:34px;color:var(--text)">'+(+v).toFixed(2)+'</b></div>';
+    }).join('');
+    return '<div class="ab-strat-card" style="border:1px solid var(--border-light);border-radius:12px;padding:12px;background:var(--bg-2)">'+
+      '<div style="font-weight:700;color:'+AB_PARAM_COLORS[si%AB_PARAM_COLORS.length]+';margin-bottom:6px">'+s.name+(si===0?' <span style="font-size:10px;color:var(--text-3)">(基线)</span>':'')+'</div>'+
+      sliders+'</div>';
+  }).join('');
+}
+
+function updateABParam(si, key, val){
+  if(abStrategies[si]) abStrategies[si].params[key] = val;
+}
+
+async function runABSim(){
+  const btn = document.getElementById('ab-run');
+  const seed = parseInt(getVal('ab-seed')||'42',10);
+  const ratio = parseFloat(getVal('ab-ratio')||'1');
+  btn.disabled = true; btn.textContent = '⏳ 模拟运行中（约 7~20 秒）…';
+  document.getElementById('ab-badge').textContent = '⏳ 运行中';
+  try{
+    const q = 'seed='+seed+'&sample_ratio='+ratio+'&strategies='+encodeURIComponent(JSON.stringify(abStrategies));
+    const res = await fetch('/api/ab_simulate?'+q).then(r=>r.json());
+    if(res.error){ showToast(res.error,'error'); document.getElementById('ab-badge').textContent='❌ 失败'; return; }
+    renderABResults(res);
+    showToast('模拟完成：'+res.n_users+' 用户，耗时 '+res.generated_at.slice(11),'success');
+  }catch(e){
+    showToast('模拟失败: '+e.message,'error');
+    document.getElementById('ab-badge').textContent = '❌ 失败';
+  }finally{
+    btn.disabled = false; btn.textContent = '▶ 运行模拟实验';
+  }
+}
+
+async function renderABFromCache(){
+  try{
+    const q = 'seed=42&sample_ratio=1&strategies='+encodeURIComponent(JSON.stringify(abStrategies));
+    // 不自动重跑；仅提示用户点击运行。缓存回显改为读取上次落盘结果由后端聚合，此处留空以避免长等待。
+  }catch(e){}
+}
+
+function renderABResults(res){
+  document.getElementById('ab-badge').textContent = '✅ '+res.generated_at.slice(5,16)+' · seed '+res.seed+' · '+res.n_users+' 用户';
+  document.getElementById('ab-last').textContent = '实验用户 '+res.n_users+' ｜ 训练期 '+res.train_period.join('~')+' ｜ 测试期 '+res.test_period.join('~');
+
+  // 对比图：模拟 GMV/用户 + 真实命中率
+  const names = res.results.map(r=>r.key);
+  const colors = res.results.map((_,i)=>AB_PARAM_COLORS[i%AB_PARAM_COLORS.length]);
+  initChart('ab-chart-metric').setOption({...baseOpt(),
+    tooltip:{trigger:'axis'},
+    legend:{data:['模拟CTR(%)','GMV/用户(¥)'],top:0,textStyle:{fontSize:11,color:'#8a6e5c'}},
+    grid:{left:56,right:56,top:40,bottom:30},
+    xAxis:{type:'category',data:names,...warmAxis()},
+    yAxis:[{type:'value',name:'CTR %',...warmAxis(),axisLabel:{formatter:v=>v,fontSize:10,color:'#b8a395'}},
+           {type:'value',name:'GMV ¥',...warmAxis(),splitLine:{show:false}}],
+    series:[
+      {name:'模拟CTR(%)',type:'bar',data:res.results.map(r=>+(r.sim_ctr*100).toFixed(2)),barWidth:'32%',itemStyle:{color:'#e8a04a',borderRadius:[4,4,0,0]},label:{show:true,position:'top',fontSize:10,color:'#8a6e5c'}},
+      {name:'GMV/用户(¥)',type:'bar',yAxisIndex:1,data:res.results.map(r=>r.sim_gmv_per_user),barWidth:'32%',itemStyle:{color:'#7ba05b',borderRadius:[4,4,0,0]},label:{show:true,position:'top',fontSize:10,color:'#8a6e5c'}}
+    ]});
+  initChart('ab-chart-real').setOption({...baseOpt(),
+    tooltip:{trigger:'axis'},
+    legend:{data:['真实命中率(%)','多样性(类目数)'],top:0,textStyle:{fontSize:11,color:'#8a6e5c'}},
+    grid:{left:56,right:56,top:40,bottom:30},
+    xAxis:{type:'category',data:names,...warmAxis()},
+    yAxis:[{type:'value',name:'%',...warmAxis(),axisLabel:{formatter:v=>v,fontSize:10,color:'#b8a395'}},
+           {type:'value',name:'类目',...warmAxis(),splitLine:{show:false},max:10}],
+    series:[
+      {name:'真实命中率(%)',type:'bar',data:res.results.map(r=>+(r.real_hit_items_per_user*100).toFixed(2)),barWidth:'32%',itemStyle:{color:'#6BA89A',borderRadius:[4,4,0,0]},label:{show:true,position:'top',fontSize:10,color:'#8a6e5c'}},
+      {name:'多样性(类目数)',type:'bar',yAxisIndex:1,data:res.results.map(r=>r.avg_diversity),barWidth:'32%',itemStyle:{color:'#d4763a',borderRadius:[4,4,0,0]},label:{show:true,position:'top',fontSize:10,color:'#8a6e5c'}}
+    ]});
+
+  // 明细表
+  const tbody = document.querySelector('#tbl-ab tbody');
+  tbody.innerHTML = res.results.map(r=>{
+    const lk = r.lift_sim_gmv_per_user;
+    const lift = lk ? (lk.abs_diff>0?'▲ +':'▼ ')+lk.abs_diff.toFixed(3)+
+      ' <span style="font-size:10px;color:'+(lk.significant?'#5e7d3e':'#b8a395')+'">p='+lk.p_value+(lk.significant?' ✱显著':' 不显著')+'</span>'+
+      '<div style="font-size:10px;color:var(--text-3)">95% CI ['+lk.ci95.join(', ')+']</div>' : '<span style="color:var(--text-3)">— (基线)</span>';
+    return '<tr><td><b style="color:'+AB_PARAM_COLORS[res.results.indexOf(r)%AB_PARAM_COLORS.length]+'">'+r.name+'</b></td>'+
+      '<td style="text-align:right">'+r.impressions.toLocaleString()+'</td>'+
+      '<td style="text-align:right">'+(r.sim_ctr*100).toFixed(2)+'%</td>'+
+      '<td style="text-align:right">'+(r.sim_cvr*100).toFixed(1)+'%</td>'+
+      '<td style="text-align:right"><b>¥'+r.sim_gmv_per_user.toFixed(2)+'</b></td>'+
+      '<td style="text-align:right">'+(r.real_hit_items_per_user*100).toFixed(2)+'%</td>'+
+      '<td style="text-align:right">'+r.avg_diversity+'</td>'+
+      '<td>'+lift+'</td></tr>';
+  }).join('');
+
+  // 结论
+  document.getElementById('ab-conclusions').innerHTML =
+    (res.conclusions||[]).map(c=>'<li>'+c+'</li>').join('');
+}
+
+// ===== Init =====
+
+// 真实数据集时间跨度与模拟数据不同，日期筛选器默认值由后端 data_period 接口自动适配
+async function initDateRange(){
+  try{
+    const p = await fetch('/api/data_period').then(r=>r.json());
+    const ids = ['p-start','r-start','u-start','pets-start'];
+    const ide = ['p-end','r-end','u-end','pets-end'];
+    ids.forEach(id=>{const el=document.getElementById(id); if(el&&p.start_date) el.value=p.start_date;});
+    ide.forEach(id=>{const el=document.getElementById(id); if(el&&p.end_date) el.value=p.end_date;});
+    if(p.start_date && p.end_date){
+      const badge=document.getElementById('ov-period-badge');
+      if(badge){
+        const fmt=s=>s? s.slice(0,7).replace('-','.') : '';
+        badge.textContent='📅 数据周期 '+fmt(p.start_date)+' - '+fmt(p.end_date);
+      }
+    }
+    if(p.source_type && p.source_type === 'REAL_PUBLIC_DATASETS'){
+      const tag=document.getElementById('src-tag');
+      if(tag){ tag.textContent='数据源：公开真实数据集（多源融合）'; tag.style.display='inline-block'; }
+    }
+  }catch(e){ /* 回退使用页面内默认日期 */ }
+  petsInitChips();
+}
+
+// ===== v1.8.0 双角色分层 =====
+// 两类用户：业务决策者（商家/运营/平台方）与方法评审者（算法/答辩评委）。
+// 业务视角隐藏技术专属模块（推荐监控/A-B 模拟/桑基/热力图）并把口径卡折叠为ⓘ；
+// 技术视角全量展示。只改 body class + data-audience 显隐，不动任何数据逻辑。
+function setRole(role, silent){
+  role = (role === 'tech') ? 'tech' : 'business';
+  document.body.classList.toggle('role-business', role==='business');
+  document.body.classList.toggle('role-tech', role==='tech');
+  const bb=document.getElementById('role-btn-biz'), bt=document.getElementById('role-btn-tech');
+  if(bb) bb.classList.toggle('active', role==='business');
+  if(bt) bt.classList.toggle('active', role==='tech');
+  try{ localStorage.setItem('bi_role', role); }catch(e){}
+  if(!silent){
+    // 切到业务视角时，若当前停在技术专属页则回落到总览
+    const active=document.querySelector('.page.active');
+    if(active && active.dataset.audience==='tech' && role==='business'){
+      const home=document.querySelector(".nav-item[onclick*='dashboard']");
+      if(home) switchPage('dashboard', home);
+    }
+    // 隐藏态切回可见态后 ECharts 需 resize 一次才能恢复正确尺寸
+    Object.values(charts).forEach(c=>{try{c&&c.resize()}catch(e){}});
+  }
+}
+
+// 业务视角下口径卡折叠为 ⓘ 按钮（技术视角口径卡默认全量展开，无按钮）
+document.querySelectorAll('.cal-tech').forEach(note=>{
+  const btn=document.createElement('button');
+  btn.className='cal-toggle'; btn.type='button'; btn.textContent='ⓘ 口径说明';
+  btn.title='点击展开/收起数据口径边界说明';
+  btn.onclick=()=>{ note.classList.toggle('open'); btn.classList.toggle('open'); };
+  note.parentNode.insertBefore(btn, note);
+});
+
+// 恢复上次选择的角色（默认业务视角——商家/运营是更高频用户）
+let __savedRole='business';
+try{ __savedRole = localStorage.getItem('bi_role') || 'business'; }catch(e){}
+setRole(__savedRole, true);
+
+// 启动编排（串行）：必须先把日期筛选器对齐到真实数据周期，再触发任何页面加载。
+// 原实现三段异步各自起跑，存在竞态——deep link 直达子页时会拿着 HTML 占位日期
+// （2025-10-01 ~ 2026-06-30，落在真实数据窗口之外）发请求，返回空数据导致图表空白。
+(async function boot(){
+  await initDateRange();
+  // ECharts 依赖加载校验：本地打包失败时给出明确提示，避免后续 setOption 级联报错
+  if(typeof echarts === 'undefined'){
+    console.error('[ECharts] echarts 依赖加载失败，请检查 /static/js/echarts.min.js 是否可访问');
+    showToast('图表组件加载失败，请刷新页面或检查网络', 'error');
+    return;
+  }
+  // 支持 URL hash 直达子页面（如 http://host:9888/#pets），便于演示跳转与深链分享；
+  // 命中 hash 时由 switchPage 负责加载对应页面，避免首页图表在隐藏容器中被初始化成 0×0。
+  // 深链指向技术专属页（/#recommendation、/#ab）时自动切到技术视角，避免落到隐藏页白屏。
+  const h = (location.hash||'').replace('#','').trim();
+  const el = h && Array.from(document.querySelectorAll('.nav-item')).find(
+    n => (n.getAttribute('onclick')||'').indexOf("'"+h+"'") >= 0);
+  if(el){
+    if(el.dataset.audience === 'tech' && document.body.classList.contains('role-business')){
+      setRole('tech', true);
+    }
+    switchPage(h, el);
+  } else { loadDashboard(); }
+})();
+
+// Window resize
+window.addEventListener('resize',()=>{Object.values(charts).forEach(c=>c&&c.resize())});
+</script>
+</body>
+</html>

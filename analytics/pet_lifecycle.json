@@ -1,0 +1,1123 @@
+{
+  "generated_at": "2026-10-18 15:52:37",
+  "params": {
+    "conflict_as_multi": true,
+    "senior_over_adult": true,
+    "min_evidence_high": 3,
+    "purity_high": 0.7,
+    "min_evidence_medium": 2,
+    "max_evidence_products": 5,
+    "top_profile_categories": 5,
+    "min_switch_gap_days": 30
+  },
+  "method": {
+    "evidence_source": "dim_product.product_name + description 正则命中（消耗品类目）",
+    "stage_patterns": {
+      "幼年": "\\b(puppy|puppies|kitten|kittens|junior)\\b|\\b(growth|growing|weaning)\\b",
+      "成年": "\\badult\\b|\\bmature\\b",
+      "老年": "\\b(senior|geriatric|aging)\\b|\\baged\\b|\\b7\\+\\b|\\b11\\+\\b"
+    },
+    "all_stage_pattern": "all life stage[s]?|all ages|any age|all breed[s]? and age",
+    "consumable_sub_categories": [
+      "Food",
+      "Health & Wellness",
+      "Health Supplies",
+      "Healthcare",
+      "Treats",
+      "Vitamins & Supplements",
+      "主粮",
+      "健康护理",
+      "零食"
+    ],
+    "conflict_policy": "同商品命中互斥阶段 → 记为「多阶段」，不参与单阶段计数；senior+adult 时 senior 优先",
+    "confidence_rule": "有效证据≥3 且纯度≥0.70 → 高；≥2 或纯度≥0.6 → 中；否则低",
+    "unknown_policy": "无任何阶段证据 → 显式标注「未知」，置信度「—」"
+  },
+  "data_stats": {
+    "total_users": 48473,
+    "users_with_evidence": 6701,
+    "users_without_evidence": 41772,
+    "users_unknown_stage": 41772,
+    "evidence_coverage": 0.1382,
+    "evidence_records": 10975,
+    "tagged_products": 1034
+  },
+  "product_tag_stats": {
+    "成年": 489,
+    "幼年": 453,
+    "无标记": 5604,
+    "老年": 92,
+    "多阶段": 41,
+    "全阶段": 57
+  },
+  "user_stage_distribution": {
+    "幼年": 2198,
+    "老年": 446,
+    "成年": 3633,
+    "过渡中": 424
+  },
+  "confidence_distribution": {
+    "中": 5639,
+    "高": 580,
+    "低": 482
+  },
+  "switch_stats": {
+    "switch_observed_users": 101,
+    "confirmed_switch_users": 86,
+    "ongoing_switch_users": 15,
+    "reverse_order_users": 168,
+    "young_only_users": 2215,
+    "adult_only_users": 3639,
+    "same_day_mixed_users": 194,
+    "short_interval_users": 47,
+    "observation_window_days": 274,
+    "observation_window": "2018-01-01 ~ 2018-10-02",
+    "min_switch_gap_days": 30,
+    "gap_p25": 47.0,
+    "gap_median": 68.0,
+    "gap_p75": 114.0,
+    "gap_mean": 83.7,
+    "confirmed_gap_median": 72.0,
+    "confirmed_gap_p25": 48.0,
+    "confirmed_gap_p75": 119.8,
+    "semantic_note": "switch_gap_days 为同一用户首次购买幼年粮与首次购买成年粮之间的观测间隔（天）。数据集观测窗口仅 274 天（2018-01-01~2018-10-02），远小于犬/猫约 12 个月的成长周期，因此本数据集**在原理上无法观测完整的幼年→成年成长切换**；此处结果只能作为「粮型偏好迁移」的行为证据，不等于宠物实际月龄（数据无出生日期字段，无法推算真实年龄）。"
+  },
+  "pet_profiles": [
+    {
+      "inferred_stage": "成年",
+      "pet_type": "狗用品",
+      "user_count": 1780,
+      "avg_orders": 7.02,
+      "avg_lifetime_amount": 859.6,
+      "confidence_dist": {
+        "高": 188,
+        "中": 1553,
+        "低": 39
+      },
+      "top_sub_categories": [
+        {
+          "sub_category": "主粮",
+          "users": 1579
+        },
+        {
+          "sub_category": "零食",
+          "users": 864
+        },
+        {
+          "sub_category": "其他用品",
+          "users": 455
+        },
+        {
+          "sub_category": "牵引与标识",
+          "users": 384
+        },
+        {
+          "sub_category": "玩具",
+          "users": 325
+        }
+      ],
+      "derived_flag": true,
+      "note": "inferred_stage 为派生推断字段（非原始字段），pet_type 为原始字段"
+    },
+    {
+      "inferred_stage": "成年",
+      "pet_type": "猫用品",
+      "user_count": 1460,
+      "avg_orders": 5.19,
+      "avg_lifetime_amount": 639.08,
+      "confidence_dist": {
+        "中": 1257,
+        "高": 192,
+        "低": 11
+      },
+      "top_sub_categories": [
+        {
+          "sub_category": "主粮",
+          "users": 1317
+        },
+        {
+          "sub_category": "零食",
+          "users": 492
+        },
+        {
+          "sub_category": "其他用品",
+          "users": 364
+        },
+        {
+          "sub_category": "猫砂及用品",
+          "users": 339
+        },
+        {
+          "sub_category": "玩具",
+          "users": 252
+        }
+      ],
+      "derived_flag": true,
+      "note": "inferred_stage 为派生推断字段（非原始字段），pet_type 为原始字段"
+    },
+    {
+      "inferred_stage": "幼年",
+      "pet_type": "狗用品",
+      "user_count": 1390,
+      "avg_orders": 7.66,
+      "avg_lifetime_amount": 835.29,
+      "confidence_dist": {
+        "中": 1281,
+        "高": 109
+      },
+      "top_sub_categories": [
+        {
+          "sub_category": "零食",
+          "users": 1118
+        },
+        {
+          "sub_category": "主粮",
+          "users": 561
+        },
+        {
+          "sub_category": "其他用品",
+          "users": 466
+        },
+        {
+          "sub_category": "玩具",
+          "users": 446
+        },
+        {
+          "sub_category": "牵引与标识",
+          "users": 422
+        }
+      ],
+      "derived_flag": true,
+      "note": "inferred_stage 为派生推断字段（非原始字段），pet_type 为原始字段"
+    },
+    {
+      "inferred_stage": "幼年",
+      "pet_type": "猫用品",
+      "user_count": 430,
+      "avg_orders": 5.02,
+      "avg_lifetime_amount": 647.63,
+      "confidence_dist": {
+        "高": 30,
+        "中": 400
+      },
+      "top_sub_categories": [
+        {
+          "sub_category": "主粮",
+          "users": 296
+        },
+        {
+          "sub_category": "零食",
+          "users": 186
+        },
+        {
+          "sub_category": "其他用品",
+          "users": 133
+        },
+        {
+          "sub_category": "猫砂及用品",
+          "users": 92
+        },
+        {
+          "sub_category": "玩具",
+          "users": 92
+        }
+      ],
+      "derived_flag": true,
+      "note": "inferred_stage 为派生推断字段（非原始字段），pet_type 为原始字段"
+    },
+    {
+      "inferred_stage": "幼年",
+      "pet_type": "通用用品",
+      "user_count": 287,
+      "avg_orders": 7.85,
+      "avg_lifetime_amount": 941.6,
+      "confidence_dist": {
+        "中": 280,
+        "高": 7
+      },
+      "top_sub_categories": [
+        {
+          "sub_category": "主粮",
+          "users": 169
+        },
+        {
+          "sub_category": "零食",
+          "users": 161
+        },
+        {
+          "sub_category": "其他用品",
+          "users": 160
+        },
+        {
+          "sub_category": "窝笼与出行",
+          "users": 96
+        },
+        {
+          "sub_category": "健康护理",
+          "users": 81
+        }
+      ],
+      "derived_flag": true,
+      "note": "inferred_stage 为派生推断字段（非原始字段），pet_type 为原始字段"
+    },
+    {
+      "inferred_stage": "成年",
+      "pet_type": "通用用品",
+      "user_count": 286,
+      "avg_orders": 8.5,
+      "avg_lifetime_amount": 1134.21,
+      "confidence_dist": {
+        "中": 275,
+        "低": 7,
+        "高": 4
+      },
+      "top_sub_categories": [
+        {
+          "sub_category": "主粮",
+          "users": 251
+        },
+        {
+          "sub_category": "其他用品",
+          "users": 167
+        },
+        {
+          "sub_category": "零食",
+          "users": 92
+        },
+        {
+          "sub_category": "窝笼与出行",
+          "users": 79
+        },
+        {
+          "sub_category": "健康护理",
+          "users": 68
+        }
+      ],
+      "derived_flag": true,
+      "note": "inferred_stage 为派生推断字段（非原始字段），pet_type 为原始字段"
+    },
+    {
+      "inferred_stage": "过渡中",
+      "pet_type": "狗用品",
+      "user_count": 267,
+      "avg_orders": 31.9,
+      "avg_lifetime_amount": 3955.81,
+      "confidence_dist": {
+        "低": 267
+      },
+      "top_sub_categories": [
+        {
+          "sub_category": "主粮",
+          "users": 248
+        },
+        {
+          "sub_category": "零食",
+          "users": 215
+        },
+        {
+          "sub_category": "其他用品",
+          "users": 156
+        },
+        {
+          "sub_category": "牵引与标识",
+          "users": 107
+        },
+        {
+          "sub_category": "玩具",
+          "users": 99
+        }
+      ],
+      "derived_flag": true,
+      "note": "inferred_stage 为派生推断字段（非原始字段），pet_type 为原始字段"
+    },
+    {
+      "inferred_stage": "老年",
+      "pet_type": "狗用品",
+      "user_count": 262,
+      "avg_orders": 5.52,
+      "avg_lifetime_amount": 799.26,
+      "confidence_dist": {
+        "中": 234,
+        "高": 28
+      },
+      "top_sub_categories": [
+        {
+          "sub_category": "主粮",
+          "users": 218
+        },
+        {
+          "sub_category": "零食",
+          "users": 130
+        },
+        {
+          "sub_category": "其他用品",
+          "users": 65
+        },
+        {
+          "sub_category": "健康护理",
+          "users": 47
+        },
+        {
+          "sub_category": "牵引与标识",
+          "users": 41
+        }
+      ],
+      "derived_flag": true,
+      "note": "inferred_stage 为派生推断字段（非原始字段），pet_type 为原始字段"
+    },
+    {
+      "inferred_stage": "老年",
+      "pet_type": "猫用品",
+      "user_count": 125,
+      "avg_orders": 5.77,
+      "avg_lifetime_amount": 735.83,
+      "confidence_dist": {
+        "中": 114,
+        "高": 11
+      },
+      "top_sub_categories": [
+        {
+          "sub_category": "主粮",
+          "users": 101
+        },
+        {
+          "sub_category": "零食",
+          "users": 58
+        },
+        {
+          "sub_category": "其他用品",
+          "users": 32
+        },
+        {
+          "sub_category": "猫砂及用品",
+          "users": 29
+        },
+        {
+          "sub_category": "窝笼与出行",
+          "users": 22
+        }
+      ],
+      "derived_flag": true,
+      "note": "inferred_stage 为派生推断字段（非原始字段），pet_type 为原始字段"
+    },
+    {
+      "inferred_stage": "过渡中",
+      "pet_type": "猫用品",
+      "user_count": 119,
+      "avg_orders": 15.49,
+      "avg_lifetime_amount": 1933.22,
+      "confidence_dist": {
+        "低": 119
+      },
+      "top_sub_categories": [
+        {
+          "sub_category": "主粮",
+          "users": 116
+        },
+        {
+          "sub_category": "零食",
+          "users": 66
+        },
+        {
+          "sub_category": "其他用品",
+          "users": 54
+        },
+        {
+          "sub_category": "猫砂及用品",
+          "users": 38
+        },
+        {
+          "sub_category": "玩具",
+          "users": 35
+        }
+      ],
+      "derived_flag": true,
+      "note": "inferred_stage 为派生推断字段（非原始字段），pet_type 为原始字段"
+    },
+    {
+      "inferred_stage": "成年",
+      "pet_type": "小宠用品",
+      "user_count": 50,
+      "avg_orders": 4.12,
+      "avg_lifetime_amount": 373.76,
+      "confidence_dist": {
+        "中": 47,
+        "低": 1,
+        "高": 2
+      },
+      "top_sub_categories": [
+        {
+          "sub_category": "主粮",
+          "users": 49
+        },
+        {
+          "sub_category": "其他用品",
+          "users": 19
+        },
+        {
+          "sub_category": "零食",
+          "users": 17
+        },
+        {
+          "sub_category": "窝笼与出行",
+          "users": 15
+        },
+        {
+          "sub_category": "玩具",
+          "users": 9
+        }
+      ],
+      "derived_flag": true,
+      "note": "inferred_stage 为派生推断字段（非原始字段），pet_type 为原始字段"
+    },
+    {
+      "inferred_stage": "幼年",
+      "pet_type": "水族用品",
+      "user_count": 47,
+      "avg_orders": 7.49,
+      "avg_lifetime_amount": 893.91,
+      "confidence_dist": {
+        "中": 46,
+        "高": 1
+      },
+      "top_sub_categories": [
+        {
+          "sub_category": "主粮",
+          "users": 38
+        },
+        {
+          "sub_category": "其他用品",
+          "users": 36
+        },
+        {
+          "sub_category": "零食",
+          "users": 17
+        },
+        {
+          "sub_category": "窝笼与出行",
+          "users": 10
+        },
+        {
+          "sub_category": "健康护理",
+          "users": 9
+        }
+      ],
+      "derived_flag": true,
+      "note": "inferred_stage 为派生推断字段（非原始字段），pet_type 为原始字段"
+    },
+    {
+      "inferred_stage": "老年",
+      "pet_type": "通用用品",
+      "user_count": 46,
+      "avg_orders": 7.72,
+      "avg_lifetime_amount": 1008.37,
+      "confidence_dist": {
+        "中": 45,
+        "高": 1
+      },
+      "top_sub_categories": [
+        {
+          "sub_category": "其他用品",
+          "users": 31
+        },
+        {
+          "sub_category": "主粮",
+          "users": 26
+        },
+        {
+          "sub_category": "零食",
+          "users": 23
+        },
+        {
+          "sub_category": "健康护理",
+          "users": 16
+        },
+        {
+          "sub_category": "窝笼与出行",
+          "users": 12
+        }
+      ],
+      "derived_flag": true,
+      "note": "inferred_stage 为派生推断字段（非原始字段），pet_type 为原始字段"
+    },
+    {
+      "inferred_stage": "成年",
+      "pet_type": "水族用品",
+      "user_count": 37,
+      "avg_orders": 10.7,
+      "avg_lifetime_amount": 1090.85,
+      "confidence_dist": {
+        "中": 36,
+        "高": 1
+      },
+      "top_sub_categories": [
+        {
+          "sub_category": "主粮",
+          "users": 33
+        },
+        {
+          "sub_category": "其他用品",
+          "users": 33
+        },
+        {
+          "sub_category": "零食",
+          "users": 12
+        },
+        {
+          "sub_category": "健康护理",
+          "users": 11
+        },
+        {
+          "sub_category": "牵引与标识",
+          "users": 7
+        }
+      ],
+      "derived_flag": true,
+      "note": "inferred_stage 为派生推断字段（非原始字段），pet_type 为原始字段"
+    },
+    {
+      "inferred_stage": "过渡中",
+      "pet_type": "通用用品",
+      "user_count": 31,
+      "avg_orders": 23.26,
+      "avg_lifetime_amount": 2955.8,
+      "confidence_dist": {
+        "低": 31
+      },
+      "top_sub_categories": [
+        {
+          "sub_category": "主粮",
+          "users": 28
+        },
+        {
+          "sub_category": "其他用品",
+          "users": 26
+        },
+        {
+          "sub_category": "零食",
+          "users": 21
+        },
+        {
+          "sub_category": "健康护理",
+          "users": 15
+        },
+        {
+          "sub_category": "窝笼与出行",
+          "users": 11
+        }
+      ],
+      "derived_flag": true,
+      "note": "inferred_stage 为派生推断字段（非原始字段），pet_type 为原始字段"
+    }
+  ],
+  "switch_cases": [
+    {
+      "user_id": "AU20f1aeb781",
+      "pet_type": "通用用品",
+      "first_young_date": "2018-01-15",
+      "first_adult_date": "2018-02-14",
+      "switch_gap_days": 30.0,
+      "n_young": 1,
+      "n_adult": 2,
+      "stage_confidence": "中"
+    },
+    {
+      "user_id": "AU63d0c6ed79",
+      "pet_type": "狗用品",
+      "first_young_date": "2018-01-18",
+      "first_adult_date": "2018-02-18",
+      "switch_gap_days": 31.0,
+      "n_young": 1,
+      "n_adult": 2,
+      "stage_confidence": "中"
+    },
+    {
+      "user_id": "AU1a33fcf2fc",
+      "pet_type": "狗用品",
+      "first_young_date": "2018-01-11",
+      "first_adult_date": "2018-02-13",
+      "switch_gap_days": 33.0,
+      "n_young": 1,
+      "n_adult": 1,
+      "stage_confidence": "低"
+    },
+    {
+      "user_id": "AU662ccb7c3f",
+      "pet_type": "猫用品",
+      "first_young_date": "2018-02-14",
+      "first_adult_date": "2018-03-19",
+      "switch_gap_days": 33.0,
+      "n_young": 1,
+      "n_adult": 3,
+      "stage_confidence": "高"
+    },
+    {
+      "user_id": "AU73c172ebbc",
+      "pet_type": "狗用品",
+      "first_young_date": "2018-04-13",
+      "first_adult_date": "2018-05-16",
+      "switch_gap_days": 33.0,
+      "n_young": 1,
+      "n_adult": 3,
+      "stage_confidence": "高"
+    },
+    {
+      "user_id": "AUa7b6d8a090",
+      "pet_type": "狗用品",
+      "first_young_date": "2018-04-09",
+      "first_adult_date": "2018-05-13",
+      "switch_gap_days": 34.0,
+      "n_young": 1,
+      "n_adult": 1,
+      "stage_confidence": "低"
+    },
+    {
+      "user_id": "AUe051a50fc3",
+      "pet_type": "狗用品",
+      "first_young_date": "2018-05-22",
+      "first_adult_date": "2018-06-25",
+      "switch_gap_days": 34.0,
+      "n_young": 1,
+      "n_adult": 2,
+      "stage_confidence": "中"
+    },
+    {
+      "user_id": "AU93eceba91c",
+      "pet_type": "猫用品",
+      "first_young_date": "2018-03-19",
+      "first_adult_date": "2018-04-23",
+      "switch_gap_days": 35.0,
+      "n_young": 1,
+      "n_adult": 3,
+      "stage_confidence": "高"
+    },
+    {
+      "user_id": "AUc43ecb4483",
+      "pet_type": "狗用品",
+      "first_young_date": "2018-02-15",
+      "first_adult_date": "2018-03-22",
+      "switch_gap_days": 35.0,
+      "n_young": 1,
+      "n_adult": 1,
+      "stage_confidence": "低"
+    },
+    {
+      "user_id": "AU1aa0a2e550",
+      "pet_type": "狗用品",
+      "first_young_date": "2018-02-16",
+      "first_adult_date": "2018-03-24",
+      "switch_gap_days": 36.0,
+      "n_young": 2,
+      "n_adult": 1,
+      "stage_confidence": "低"
+    },
+    {
+      "user_id": "AUc15df02384",
+      "pet_type": "狗用品",
+      "first_young_date": "2018-03-23",
+      "first_adult_date": "2018-04-29",
+      "switch_gap_days": 37.0,
+      "n_young": 3,
+      "n_adult": 2,
+      "stage_confidence": "中"
+    },
+    {
+      "user_id": "AUd95601321d",
+      "pet_type": "狗用品",
+      "first_young_date": "2018-05-06",
+      "first_adult_date": "2018-06-12",
+      "switch_gap_days": 37.0,
+      "n_young": 2,
+      "n_adult": 4,
+      "stage_confidence": "中"
+    },
+    {
+      "user_id": "AUabdca14a94",
+      "pet_type": "猫用品",
+      "first_young_date": "2018-03-22",
+      "first_adult_date": "2018-04-29",
+      "switch_gap_days": 38.0,
+      "n_young": 1,
+      "n_adult": 1,
+      "stage_confidence": "低"
+    },
+    {
+      "user_id": "AUc54e140a2d",
+      "pet_type": "狗用品",
+      "first_young_date": "2018-03-02",
+      "first_adult_date": "2018-04-09",
+      "switch_gap_days": 38.0,
+      "n_young": 1,
+      "n_adult": 3,
+      "stage_confidence": "高"
+    },
+    {
+      "user_id": "AU6808487b57",
+      "pet_type": "狗用品",
+      "first_young_date": "2018-01-15",
+      "first_adult_date": "2018-02-25",
+      "switch_gap_days": 41.0,
+      "n_young": 2,
+      "n_adult": 2,
+      "stage_confidence": "中"
+    },
+    {
+      "user_id": "AUb104b3d781",
+      "pet_type": "猫用品",
+      "first_young_date": "2018-01-13",
+      "first_adult_date": "2018-02-24",
+      "switch_gap_days": 42.0,
+      "n_young": 4,
+      "n_adult": 1,
+      "stage_confidence": "低"
+    },
+    {
+      "user_id": "AUce26601dac",
+      "pet_type": "狗用品",
+      "first_young_date": "2018-04-18",
+      "first_adult_date": "2018-05-30",
+      "switch_gap_days": 42.0,
+      "n_young": 1,
+      "n_adult": 1,
+      "stage_confidence": "低"
+    },
+    {
+      "user_id": "AU508cbdbce7",
+      "pet_type": "狗用品",
+      "first_young_date": "2018-01-19",
+      "first_adult_date": "2018-03-04",
+      "switch_gap_days": 44.0,
+      "n_young": 1,
+      "n_adult": 5,
+      "stage_confidence": "高"
+    },
+    {
+      "user_id": "AU4051be7a47",
+      "pet_type": "狗用品",
+      "first_young_date": "2018-02-14",
+      "first_adult_date": "2018-04-01",
+      "switch_gap_days": 46.0,
+      "n_young": 1,
+      "n_adult": 4,
+      "stage_confidence": "高"
+    },
+    {
+      "user_id": "AUdeaa993adb",
+      "pet_type": "通用用品",
+      "first_young_date": "2018-01-07",
+      "first_adult_date": "2018-02-23",
+      "switch_gap_days": 47.0,
+      "n_young": 1,
+      "n_adult": 1,
+      "stage_confidence": "低"
+    },
+    {
+      "user_id": "AU302f53b5a9",
+      "pet_type": "小宠用品",
+      "first_young_date": "2018-03-23",
+      "first_adult_date": "2018-05-09",
+      "switch_gap_days": 47.0,
+      "n_young": 1,
+      "n_adult": 1,
+      "stage_confidence": "低"
+    },
+    {
+      "user_id": "AU75f87fa900",
+      "pet_type": "狗用品",
+      "first_young_date": "2018-04-06",
+      "first_adult_date": "2018-05-24",
+      "switch_gap_days": 48.0,
+      "n_young": 1,
+      "n_adult": 1,
+      "stage_confidence": "低"
+    },
+    {
+      "user_id": "AU28e5481a80",
+      "pet_type": "狗用品",
+      "first_young_date": "2018-01-05",
+      "first_adult_date": "2018-02-22",
+      "switch_gap_days": 48.0,
+      "n_young": 4,
+      "n_adult": 7,
+      "stage_confidence": "中"
+    },
+    {
+      "user_id": "AU926543cf10",
+      "pet_type": "猫用品",
+      "first_young_date": "2018-03-27",
+      "first_adult_date": "2018-05-15",
+      "switch_gap_days": 49.0,
+      "n_young": 1,
+      "n_adult": 1,
+      "stage_confidence": "低"
+    },
+    {
+      "user_id": "AU88f91c588e",
+      "pet_type": "狗用品",
+      "first_young_date": "2018-01-27",
+      "first_adult_date": "2018-03-17",
+      "switch_gap_days": 49.0,
+      "n_young": 1,
+      "n_adult": 1,
+      "stage_confidence": "低"
+    },
+    {
+      "user_id": "AUe4310b75f2",
+      "pet_type": "狗用品",
+      "first_young_date": "2018-02-11",
+      "first_adult_date": "2018-04-03",
+      "switch_gap_days": 51.0,
+      "n_young": 1,
+      "n_adult": 1,
+      "stage_confidence": "低"
+    },
+    {
+      "user_id": "AU24d22e03af",
+      "pet_type": "狗用品",
+      "first_young_date": "2018-04-01",
+      "first_adult_date": "2018-05-22",
+      "switch_gap_days": 51.0,
+      "n_young": 3,
+      "n_adult": 2,
+      "stage_confidence": "中"
+    },
+    {
+      "user_id": "AU7fa5296376",
+      "pet_type": "通用用品",
+      "first_young_date": "2018-04-07",
+      "first_adult_date": "2018-05-28",
+      "switch_gap_days": 51.0,
+      "n_young": 1,
+      "n_adult": 1,
+      "stage_confidence": "低"
+    },
+    {
+      "user_id": "AUa838cdeb5e",
+      "pet_type": "猫用品",
+      "first_young_date": "2018-06-21",
+      "first_adult_date": "2018-08-12",
+      "switch_gap_days": 52.0,
+      "n_young": 1,
+      "n_adult": 1,
+      "stage_confidence": "低"
+    },
+    {
+      "user_id": "AUc814adac5e",
+      "pet_type": "猫用品",
+      "first_young_date": "2018-01-25",
+      "first_adult_date": "2018-03-19",
+      "switch_gap_days": 53.0,
+      "n_young": 4,
+      "n_adult": 1,
+      "stage_confidence": "低"
+    },
+    {
+      "user_id": "AUa8775a6091",
+      "pet_type": "狗用品",
+      "first_young_date": "2018-03-30",
+      "first_adult_date": "2018-05-23",
+      "switch_gap_days": 54.0,
+      "n_young": 2,
+      "n_adult": 1,
+      "stage_confidence": "低"
+    },
+    {
+      "user_id": "AU318b2739dd",
+      "pet_type": "狗用品",
+      "first_young_date": "2018-03-17",
+      "first_adult_date": "2018-05-10",
+      "switch_gap_days": 54.0,
+      "n_young": 1,
+      "n_adult": 3,
+      "stage_confidence": "高"
+    },
+    {
+      "user_id": "AUbc4a4c9059",
+      "pet_type": "狗用品",
+      "first_young_date": "2018-01-19",
+      "first_adult_date": "2018-03-17",
+      "switch_gap_days": 57.0,
+      "n_young": 1,
+      "n_adult": 8,
+      "stage_confidence": "高"
+    },
+    {
+      "user_id": "AUe182ebbc16",
+      "pet_type": "猫用品",
+      "first_young_date": "2018-01-09",
+      "first_adult_date": "2018-03-10",
+      "switch_gap_days": 60.0,
+      "n_young": 1,
+      "n_adult": 1,
+      "stage_confidence": "低"
+    },
+    {
+      "user_id": "AU616089705b",
+      "pet_type": "猫用品",
+      "first_young_date": "2018-01-01",
+      "first_adult_date": "2018-03-04",
+      "switch_gap_days": 62.0,
+      "n_young": 4,
+      "n_adult": 2,
+      "stage_confidence": "中"
+    },
+    {
+      "user_id": "AU1b83d5da74",
+      "pet_type": "狗用品",
+      "first_young_date": "2018-01-02",
+      "first_adult_date": "2018-03-06",
+      "switch_gap_days": 63.0,
+      "n_young": 11,
+      "n_adult": 12,
+      "stage_confidence": "中"
+    },
+    {
+      "user_id": "AU54dac2f277",
+      "pet_type": "狗用品",
+      "first_young_date": "2018-04-16",
+      "first_adult_date": "2018-06-20",
+      "switch_gap_days": 65.0,
+      "n_young": 1,
+      "n_adult": 1,
+      "stage_confidence": "低"
+    },
+    {
+      "user_id": "AU9508a19d78",
+      "pet_type": "狗用品",
+      "first_young_date": "2018-02-07",
+      "first_adult_date": "2018-04-13",
+      "switch_gap_days": 65.0,
+      "n_young": 2,
+      "n_adult": 1,
+      "stage_confidence": "低"
+    },
+    {
+      "user_id": "AU9733544569",
+      "pet_type": "狗用品",
+      "first_young_date": "2018-03-06",
+      "first_adult_date": "2018-05-10",
+      "switch_gap_days": 65.0,
+      "n_young": 1,
+      "n_adult": 1,
+      "stage_confidence": "低"
+    },
+    {
+      "user_id": "AU385b658883",
+      "pet_type": "狗用品",
+      "first_young_date": "2018-02-11",
+      "first_adult_date": "2018-04-19",
+      "switch_gap_days": 67.0,
+      "n_young": 1,
+      "n_adult": 1,
+      "stage_confidence": "低"
+    },
+    {
+      "user_id": "AUeaed78fdba",
+      "pet_type": "狗用品",
+      "first_young_date": "2018-02-17",
+      "first_adult_date": "2018-04-26",
+      "switch_gap_days": 68.0,
+      "n_young": 1,
+      "n_adult": 1,
+      "stage_confidence": "低"
+    },
+    {
+      "user_id": "AUc419d48338",
+      "pet_type": "狗用品",
+      "first_young_date": "2018-03-11",
+      "first_adult_date": "2018-05-21",
+      "switch_gap_days": 71.0,
+      "n_young": 4,
+      "n_adult": 2,
+      "stage_confidence": "中"
+    },
+    {
+      "user_id": "AU7a23d93b4f",
+      "pet_type": "狗用品",
+      "first_young_date": "2018-02-11",
+      "first_adult_date": "2018-04-23",
+      "switch_gap_days": 71.0,
+      "n_young": 1,
+      "n_adult": 1,
+      "stage_confidence": "低"
+    },
+    {
+      "user_id": "AU332532dcfa",
+      "pet_type": "狗用品",
+      "first_young_date": "2018-05-22",
+      "first_adult_date": "2018-08-03",
+      "switch_gap_days": 73.0,
+      "n_young": 1,
+      "n_adult": 1,
+      "stage_confidence": "低"
+    },
+    {
+      "user_id": "AU9c1aff83be",
+      "pet_type": "狗用品",
+      "first_young_date": "2018-02-12",
+      "first_adult_date": "2018-04-27",
+      "switch_gap_days": 74.0,
+      "n_young": 2,
+      "n_adult": 1,
+      "stage_confidence": "低"
+    },
+    {
+      "user_id": "AU41c5c971de",
+      "pet_type": "通用用品",
+      "first_young_date": "2018-03-10",
+      "first_adult_date": "2018-06-01",
+      "switch_gap_days": 83.0,
+      "n_young": 1,
+      "n_adult": 1,
+      "stage_confidence": "低"
+    },
+    {
+      "user_id": "AUcd29e173b7",
+      "pet_type": "狗用品",
+      "first_young_date": "2018-04-17",
+      "first_adult_date": "2018-07-09",
+      "switch_gap_days": 83.0,
+      "n_young": 4,
+      "n_adult": 1,
+      "stage_confidence": "低"
+    },
+    {
+      "user_id": "AU6ace69f2e8",
+      "pet_type": "狗用品",
+      "first_young_date": "2018-03-15",
+      "first_adult_date": "2018-06-09",
+      "switch_gap_days": 86.0,
+      "n_young": 4,
+      "n_adult": 1,
+      "stage_confidence": "低"
+    },
+    {
+      "user_id": "AU2ecd214db0",
+      "pet_type": "水族用品",
+      "first_young_date": "2018-01-30",
+      "first_adult_date": "2018-04-30",
+      "switch_gap_days": 90.0,
+      "n_young": 3,
+      "n_adult": 2,
+      "stage_confidence": "中"
+    },
+    {
+      "user_id": "AUe5f6c83e6e",
+      "pet_type": "狗用品",
+      "first_young_date": "2018-01-11",
+      "first_adult_date": "2018-04-12",
+      "switch_gap_days": 91.0,
+      "n_young": 1,
+      "n_adult": 1,
+      "stage_confidence": "低"
+    }
+  ],
+  "limitations": [
+    "4 个原始数据集均无宠物品种/年龄/体重字段，dim_user.pet_age_group 100% 为「未知」",
+    "生命阶段为基于商品文本的派生推断，非平台标注的真实标签，无 ground truth 可校验准确率",
+    "数据集观测窗口仅 274 天，远小于犬/猫约 12 个月成长周期，原理上无法观测完整的幼年→成年成长切换，结果仅可作为粮型偏好迁移的行为证据",
+    "购买记录为快照式历史行为（大量同日多品下单），非连续纵向追踪，间隔语义受限",
+    "用户购买可能包含为他人/多宠代买，无法从数据区分",
+    "关键词规则基于英文商品标题，未覆盖的中文/小众表述会被判为「无标记」"
+  ]
+}

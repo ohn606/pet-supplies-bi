@@ -1,0 +1,189 @@
+{
+  "generated_at": "2026-10-18 20:05:04",
+  "seed": 42,
+  "sample_ratio": 1.0,
+  "params": {
+    "split_date": 20180801,
+    "top_k": 10,
+    "slots_per_category": 3,
+    "base_ctr": 0.04,
+    "base_cvr": 0.25,
+    "affinity_gain": 0.9,
+    "co_gain": 0.6,
+    "position_decay": 0.85,
+    "price_fit_gain": 0.3,
+    "n_bootstrap": 1000,
+    "min_test_orders": 1
+  },
+  "strategies": [
+    {
+      "key": "A",
+      "name": "A · 纯热度基线",
+      "params": {
+        "w_pop": 1,
+        "w_affinity": 0,
+        "w_co": 0,
+        "epsilon": 0
+      }
+    },
+    {
+      "key": "B",
+      "name": "B · 个性化类目亲和",
+      "params": {
+        "w_pop": 0.3,
+        "w_affinity": 0.7,
+        "w_co": 0,
+        "epsilon": 0
+      }
+    },
+    {
+      "key": "C",
+      "name": "C · 亲和 + 时序补货信号",
+      "params": {
+        "w_pop": 0.2,
+        "w_affinity": 0.4,
+        "w_co": 0.35,
+        "epsilon": 0
+      }
+    }
+  ],
+  "n_users": 2371,
+  "train_period": [
+    "2018-01-01",
+    "2018-07-31"
+  ],
+  "test_period": [
+    "2018-08-01",
+    "2018-10-02"
+  ],
+  "results": [
+    {
+      "key": "A",
+      "name": "A · 纯热度基线",
+      "params": {
+        "w_pop": 1,
+        "w_affinity": 0,
+        "w_co": 0,
+        "epsilon": 0
+      },
+      "impressions": 23710,
+      "sim_ctr": 0.02497,
+      "sim_cvr": 0.2973,
+      "sim_gmv": 12686.44,
+      "sim_gmv_per_user": 5.3507,
+      "sim_clicks_per_user": 0.2497,
+      "real_hit_rate": 0.00464,
+      "real_hit_items_per_user": 0.0046,
+      "avg_diversity": 4.0,
+      "simulated": true
+    },
+    {
+      "key": "B",
+      "name": "B · 个性化类目亲和",
+      "params": {
+        "w_pop": 0.3,
+        "w_affinity": 0.7,
+        "w_co": 0,
+        "epsilon": 0
+      },
+      "impressions": 23710,
+      "sim_ctr": 0.02792,
+      "sim_cvr": 0.29003,
+      "sim_gmv": 17678.75,
+      "sim_gmv_per_user": 7.4562,
+      "sim_clicks_per_user": 0.2792,
+      "real_hit_rate": 0.00717,
+      "real_hit_items_per_user": 0.0072,
+      "avg_diversity": 4.0,
+      "simulated": true,
+      "lift_sim_gmv_per_user": {
+        "vs": "A",
+        "abs_diff": 2.10557,
+        "ci95": [
+          0.54238,
+          3.75864
+        ],
+        "p_value": 0.008,
+        "significant": true
+      },
+      "lift_real_hit_items_per_user": {
+        "vs": "A",
+        "abs_diff": 0.00253,
+        "ci95": [
+          0.00084,
+          0.00464
+        ],
+        "p_value": 0.004,
+        "significant": true
+      },
+      "lift_sim_clicks_per_user": {
+        "vs": "A",
+        "abs_diff": 0.02952,
+        "ci95": [
+          -0.00086,
+          0.05737
+        ],
+        "p_value": 0.06,
+        "significant": false
+      }
+    },
+    {
+      "key": "C",
+      "name": "C · 亲和 + 时序补货信号",
+      "params": {
+        "w_pop": 0.2,
+        "w_affinity": 0.4,
+        "w_co": 0.35,
+        "epsilon": 0
+      },
+      "impressions": 23710,
+      "sim_ctr": 0.02737,
+      "sim_cvr": 0.28351,
+      "sim_gmv": 14094.24,
+      "sim_gmv_per_user": 5.9444,
+      "sim_clicks_per_user": 0.2737,
+      "real_hit_rate": 0.00717,
+      "real_hit_items_per_user": 0.0072,
+      "avg_diversity": 4.0,
+      "simulated": true,
+      "lift_sim_gmv_per_user": {
+        "vs": "A",
+        "abs_diff": 0.59376,
+        "ci95": [
+          -0.76383,
+          2.04419
+        ],
+        "p_value": 0.386,
+        "significant": false
+      },
+      "lift_real_hit_items_per_user": {
+        "vs": "A",
+        "abs_diff": 0.00253,
+        "ci95": [
+          0.00084,
+          0.00464
+        ],
+        "p_value": 0.004,
+        "significant": true
+      },
+      "lift_sim_clicks_per_user": {
+        "vs": "A",
+        "abs_diff": 0.02404,
+        "ci95": [
+          -0.00295,
+          0.05441
+        ],
+        "p_value": 0.084,
+        "significant": false
+      }
+    }
+  ],
+  "conclusions": [
+    "模拟 GMV/用户最优：B · 个性化类目亲和（7.4562，CTR 2.79%，CVR 29.0%）",
+    "B · 个性化类目亲和 相对 A 高于 2.106 GMV/用户（95% CI [0.54238, 3.75864]，p=0.008，显著）",
+    "C · 亲和 + 时序补货信号 相对 A 高于 0.594 GMV/用户（95% CI [-0.76383, 2.04419]，p=0.386，不显著）",
+    "真实命中率最优：B · 个性化类目亲和（real_hit 0.72%/用户）——该指标由测试期真实购买计算，不受响应模型假设影响",
+    "注意：模拟层 CTR/CVR/GMV 依赖响应模型假设（建模假设，非数据事实），论文引用时应以 real_hit_rate 等真实锚点为主要证据。"
+  ],
+  "method_note": "真实锚点层（real_hit_rate 等）完全由测试期真实购买计算；模拟响应层（sim_ctr/sim_cvr/sim_gmv）由显式响应模型生成：p_click = base_ctr × (1+affinity_gain×类目亲和) × (1+co_gain×周期接近度) × position_decay^rank，p_conv = base_cvr × (1+price_fit_gain×价格带匹配)。响应模型为建模假设而非数据事实；显著性为用户级配对 bootstrap 检验。同 (seed, 策略组) 配置重跑结果逐位一致。"
+}
